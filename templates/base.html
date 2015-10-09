@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <header>
+      <ul>
+        <li><a href="/welcome">Welcome</a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="/user">Account</a></li>
+        <li><a href="/stocks">Stocks</a></li>
+        <li><a href="/logout">Log out</a></li>
+      </ul>
+    </header>
+    <div class="container">
+      <!-- messages -->
+      {% for message in get_flashed_messages() %}
+      <p class="flash">  {{ message }} </p>
+      {% endfor %}
+      
+      <!-- errors -->
+      {% if error %}
+        <p class="error">Error: {{ error }}</p>
+      {% endif %}
+
+      <!-- child template -->
+      
+      {% block content %}{% endblock %}
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+  
+{% block content %}
+
+<!-- nonWTF form -->
+<!-- <form action="{{ url_for('stocks') }}" method="post">
+  <input type="text" placeholder="SYM" name="symbol" value="">
+  <input class="btn btn-default" type="submit" value="Login">
+</form> -->
+<h1>Stock page</h1>
+
+<form action="{{ url_for('stocks') }}" method="post">
+	{{ form.hidden_tag() }}
+	<p>Search for a stock symbol:
+		{{ form.stocklookup(size=4) }}
+	<input type="submit" value="Look up"></p>
+</form>
+
+	<!-- display stock if there is one -->
+	{% if stock %}
+<!-- new version with tables -->
+<div id="stock">
+	<div id="summary">
+		<span id="name">{{ stock.data_set["Name"] }} ({{ stock.data_set['symbol'].upper() }})</span>
+		<span id="exchange"> - {{ stock.get_stock_exchange() }}</span><br>
+		<span id="price" >${{ stock.get_price() }}</span>
+		{% if loss %}
+		<span class="loss">{{ stock.get_change() }} ({{ stock.data_set["PercentChange"] }})</span>
+		{% endif %}
+		{% if not loss %}
+		<span id="change">{{ stock.get_change() }} ({{ stock.data_set["PercentChange"] }})</span><br>	
+		{% endif %}
+		<span id="lasttrade">Last trade: {{ stock.get_trade_datetime() }}</span><br>
+		<span id="afterhours">After hours: {{ stock.data_set['AfterHoursChangeRealtime'] }}</span>
+	</div>
+	<div id="stocktables">
+		<table>
+			<tr>
+				<td>Prev close:</td><td class="value">${{ stock.get_prev_close() }}</td>
+			</tr>
+			<tr>
+				<td>Open:</td><td class="value">${{ stock.get_open() }}</td>
+			</tr>
+			<tr>
+				<td>Bid:</td><td class="value">${{ stock.data_set['Bid'] }}</td>
+			</tr>
+			<tr>
+				<td>Ask:</td><td class="value">${{ stock.data_set['Ask']}}</td>
+			</tr>
+			<tr>
+				<td>1y Target Est:</td><td class="value">${{ stock.data_set['OneyrTargetPrice'] }}</td>
+			</tr>
+			<tr>
+				<td>Volume:</td><td class="value">{{ stock.get_volume() }}</td>
+			</tr>
+			<tr>
+				<td>Avg Vol:</td><td class="value">{{ stock.get_avg_daily_volume() }}</td>
+			</tr>
+		</table>
+		<table>
+			<tr>
+				<td>Day's Range:</td><td class="value">${{ stock.get_days_high() }} - ${{ stock.get_days_low() }}</td>
+			</tr>
+			<tr>
+				<td>52wk Range:</td><td class="value">${{ stock.get_year_high() }} - ${{ stock.get_year_low() }}</td>
+			</tr>
+			<tr>
+				<td>Market Cap</td><td class="value">{{ stock.data_set["MarketCapitalization"] }}</td>
+			</tr>
+			<tr>
+				<td>P/E:</td><td class="value">${{ stock.data_set["PERatio"] }}</td>
+			</tr>
+			<tr>
+				<td>Div Yield:</td><td class="value">{{ stock.data_set["DividendYield"] }}%</td>	
+			</tr>
+			<tr>
+				<td>Ex Div:</td><td class="value">{{ stock.data_set['ExDividendDate'] }}</td>
+			</tr>
+			<tr>
+				<td>Div Pay Date:</td><td class="value">{{ stock.data_set['DividendPayDate'] }}</td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<!-- this is cool to have, but I think I already have too much info. -->
+<!-- 		<tr>
+			<td>Short ratio:</td><td>{{ stock.data_set['ShortRatio'] }}</td>
+		</tr> -->
+
+
+	<!-- old version with unordered list -->
+<!-- <div id="stock">
+  <h2>{{ stock.data_set["Name"] }}</h2>
+<ul>
+	<li>Name: {{ stock.data_set["Name"] }}
+	<li>Symbol:  {{ stock.symbol.upper() }} 
+	<li>Exchange:  {{ stock.data_set["StockExchange"] }}
+	<li>Price: ${{ stock.data_set["LastTradePriceOnly"] }} 
+	<li>Open: ${{ stock.data_set["Open"] }}
+	<li>Percentage change: {{ stock.data_set["PercentChange"] }}
+	<li>Day's Range: ${{ stock.data_set["DaysRange"] }}
+	<li>50-day moving average: ${{ stock.data_set["FiftydayMovingAverage"] }}
+	<li>200-day moving average: ${{ stock.data_set["TwoHundreddayMovingAverage"] }}
+	<li>52 week high: ${{ stock.data_set["YearHigh"] }}
+	<li>52 week low: ${{ stock.data_set["YearLow"] }}
+	<li>Price/earnings: ${{ stock.data_set["PERatio"] }}
+	<li>Volume: {{ stock.data_set["Volume"] }}
+	<li>Average Daily Volume: {{ stock.data_set["AverageDailyVolume"] }}
+	<li>Dividend yield: {{ stock.data_set["DividendYield"] }}%
+	<li>Dividend Pay date: {{ stock.data_set["DividendPayDate"] }}
+	<li>Ex dividend date: {{ stock.data_set["ExDividendDate"] }}
+	<li>Dividend Share: {{ stock.data_set["DividendShare"] }}
+	<li>Market Cap: {{ stock.data_set["MarketCapitalization"] }}
+</ul>
+	</div> -->
+	{% endif %}
+{% endblock %}

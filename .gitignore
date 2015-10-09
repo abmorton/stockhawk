@@ -1,0 +1,6 @@
+*.pyc
+venv
+.DS_Store
+blog
+*.db
+heroku_setup_instructions.txt
