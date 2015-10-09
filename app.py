@@ -24,23 +24,23 @@ def login_required(f):
 		if 'logged_in' in session:
 			return f(*args, **kwargs)
 		else:
-			flash('You need to login first.')
+			flash('You need to log in first.')
 			return redirect(url_for('login'))
 	return wrap
 
 # views
 
 @app.route('/')
-@login_required
+# @login_required
 def home():
-	title = 'home'
+	title = 'StockHawk'
 	return render_template('index.html', title=title)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	error = None
 	form = LoginForm(request.form)
-	title = 'Login page'
+	title = 'StockHawk - Login'
 
 	if request.method == 'POST':
 		# if (request.form['username'] != 'admin') or (request.form['password'] != 'admin'):
@@ -49,32 +49,32 @@ def login():
 		else:
 			session['logged_in'] = True
 			flash('You were just logged in.')
-			return redirect(url_for('home'))
+			return redirect(url_for('user'))
 	return render_template('login.html', form=form, error=error, title=title)
 
 @app.route('/logout')
+@login_required
 def logout():
 	session.pop('logged_in', None)
 	flash('You were just logged out.')
-	return redirect(url_for('welcome'))
+	return redirect(url_for('home'))
 
 @app.route('/welcome')
 def welcome():
-	title = 'Welcome'
+	title = 'StockHawk - Welcome'
 	return render_template('welcome.html', title=title)
 
 @app.route('/user')
 @login_required
 def user():
-	title = 'My account'
+	title = 'StockHawk - Account'
 	return render_template('account.html', title=title)
 
 @app.route('/stocks', methods=['GET', 'POST'])
 # @login_required
 def stocks():
 
-	title = 'Look up a stock'	
-	
+	title = 'StockHawk - Stock lookup'	
 	stock = None
 	form = StockSearchForm(request.form)
 
@@ -97,6 +97,7 @@ def stocks():
 			else:
 				change = float(stock.get_change())
 				loss = set_color(change)
+				title = 'StockHawk - '+stock.symbol.upper()
 		else:
 			flash("Please enter a stock.")
 			return redirect(url_for('stocks'))

@@ -7,8 +7,10 @@
   <input type="text" placeholder="SYM" name="symbol" value="">
   <input class="btn btn-default" type="submit" value="Login">
 </form> -->
-<h1>Stock page</h1>
-
+<h1>{{ title }}</h1>
+<br>
+<p>As of now, this is the only feature which is set up. Try it out!</p>
+<br>
 <form action="{{ url_for('stocks') }}" method="post">
 	{{ form.hidden_tag() }}
 	<p>Search for a stock symbol:
