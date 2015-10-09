@@ -25,13 +25,13 @@
 		<span id="exchange"> - {{ stock.get_stock_exchange() }}</span><br>
 		<span id="price" >${{ stock.get_price() }}</span>
 		{% if loss %}
-		<span class="loss">{{ stock.get_change() }} ({{ stock.data_set["PercentChange"] }})</span>
+		<span class="loss">{{ stock.get_change() }} ({{ stock.data_set["PercentChange"] }})</span><br>
 		{% endif %}
 		{% if not loss %}
 		<span id="change">{{ stock.get_change() }} ({{ stock.data_set["PercentChange"] }})</span><br>	
 		{% endif %}
-		<span id="lasttrade">Last trade: {{ stock.get_trade_datetime() }}</span><br>
 		<span id="afterhours">After hours: {{ stock.data_set['AfterHoursChangeRealtime'] }}</span>
+		<span id="lasttrade">Last trade: {{ stock.get_trade_datetime() }}</span>
 	</div>
 	<div id="stocktables">
 		<table>

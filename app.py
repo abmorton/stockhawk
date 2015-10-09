@@ -79,7 +79,6 @@ def stocks():
 	form = StockSearchForm(request.form)
 
 	def set_color(change):
-		
 		if change < 0.0000000:
 			loss = True
 		else:
