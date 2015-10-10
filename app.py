@@ -10,7 +10,7 @@ app = Flask(__name__)
 # config data, to be moved later
 app.secret_key = 'myohmy'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///practice.db'
-app.debug = True
+app.debug = False
 
 # create sqlalchemy object 
 
