@@ -4,3 +4,5 @@ venv
 blog
 *.db
 heroku_setup_instructions.txt
+*.ipynb
+.ipynb_checkpoints/
