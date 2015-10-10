@@ -14,7 +14,8 @@
 <form action="{{ url_for('stocks') }}" method="post">
 	{{ form.hidden_tag() }}
 	<p>Search for a stock symbol:
-		{{ form.stocklookup(size=6) }}
+{{ form.stocklookup(size=8, autofocus="autofocus") }}
+
 	<input type="submit" value="Search"></p>
 </form>
 

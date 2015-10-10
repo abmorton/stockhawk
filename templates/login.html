@@ -18,7 +18,7 @@
 	{{ form.hidden_tag() }}
 
 	<p>Username:
-		{{ form.username }}
+		{{ form.username(autofocus="autofocus", placeholder="user@email.com") }}
 		Password:
 		{{ form.password }}
 
