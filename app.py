@@ -90,6 +90,36 @@ def stocks():
 
 			stock = Share(form.stocklookup.data)
 
+			# trying to consolidate stock attributes into one place.
+			# this will allow simpler template references as well as
+			# facilitate working with dbs.
+			stock.name = stock.data_set["Name"]
+			stock.symbol = stock.symbol.upper()
+			stock.exchange = stock.get_stock_exchange()
+			stock.price = stock.get_price()
+			stock.change = stock.get_change()
+			stock.percent_change = stock.data_set["PercentChange"]
+			stock.afterhours = stock.data_set['AfterHoursChangeRealtime']
+			stock.last_traded = stock.get_trade_datetime()
+			stock.prev_close = stock.get_prev_close()
+			stock.open = stock.get_open()
+			stock.bid = stock.data_set['Bid']
+			stock.ask = stock.data_set['Ask']
+			stock.yr_target = stock.data_set['OneyrTargetPrice']
+			stock.volume = stock.get_volume()
+			stock.av_volume = stock.get_avg_daily_volume()
+			stock.day_low = stock.get_days_low()
+			stock.day_high = stock.get_days_high()
+			stock.day_range = stock.day_high+" - "+stock.day_low
+			stock.year_high = stock.get_year_high()
+			stock.year_low = stock.get_year_low()
+			stock.year_range = stock.year_high+" - "+stock.year_low
+			stock.market_cap = stock.data_set["MarketCapitalization"]
+			stock.peratio = stock.data_set["PERatio"]
+			stock.div = stock.data_set["DividendYield"]
+			stock.ex_div = stock.data_set['ExDividendDate']
+			stock.div_pay = stock.data_set['DividendPayDate']
+
 			if stock.get_price() == None:
 				flash("Couldn't find stock matching '"+form.stocklookup.data.upper()+"'. Try another symbol.")
 				stock = None
@@ -97,7 +127,7 @@ def stocks():
 			else:
 				change = float(stock.get_change())
 				loss = set_color(change)
-				title = 'StockHawk - '+stock.symbol.upper()
+				title = 'StockHawk - '+stock.symbol
 		else:
 			flash("Please enter a stock.")
 			return redirect(url_for('stocks'))
@@ -106,6 +136,7 @@ def stocks():
 
 	elif request.method == 'GET':
 		return render_template('stocks.html', form=form, stock=stock, title=title)
+
 
 
 if __name__ == '__main__':
