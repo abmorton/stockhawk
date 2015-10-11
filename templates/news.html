@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<h3>Releases</h3>
+<br>
+
+
+<div class="release">
+	<span class="date">10/10/15</span>
+	<span class="release_num">Alpha 0.11</span>
+	<ul class="newfeatures">
+		<li>Added news page with release info.</li>
+		<li>Backend database preperation work.</li>
+		<li>Fixed a bug which caused the server to crash when very long search queries were entered on stock page.</li>
+	</ul>
+</div>
+<div class="release">
+	<span class="date">10/9/15</span>
+	<span class="release_num">Alpha 0.1</span>
+	<ul class="newfeatures">
+		<li>Pushed application to Heroku server.</li>
+		<li>Bug fixes when searching for stocks with 'white space' or non letter characters.</li>
+		<li>Backend logic to determine display style/color of price change on stock page (no JavaScript needed!)</li>
+		<li>Refactored backend structure, simplifying templating for stock information and preparing for entry into database.</li>
+		<li>Auto-focusing on text field on stock search and user login pages.</li>
+		<li>Updates to stylesheet, overriding Bootstrap's form focus styles for user inputs.</li>
+	</ul>
+</div>
+
+{% endblock %}
+
+<!-- <div class="release">
+	<span class="date"></span>
+	<span class="release_num"></span>
+	<ul class="newfeatures">
+		<li></li>
+		<li></li>
+		<li></li>
+	</ul>
+</div>
+ -->

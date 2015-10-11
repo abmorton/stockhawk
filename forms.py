@@ -1,9 +1,9 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, validators
+from wtforms import TextField, PasswordField, validators
 
 class StockSearchForm(Form):
-	stocklookup = StringField('stocklookup', [validators.Required()])
+	stocklookup = TextField('stocklookup', [validators.Length(min=1, max=15)])
 
 class LoginForm(Form):
-	username = StringField('username')
-	password = StringField('password')
+	username = TextField('username')
+	password = PasswordField('password')

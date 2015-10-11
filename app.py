@@ -9,12 +9,16 @@ app = Flask(__name__)
 
 # config data, to be moved later
 app.secret_key = 'myohmy'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///practice.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flaskpractice.db'
 app.debug = False
 
 # create sqlalchemy object 
 
 db = SQLAlchemy(app)
+
+# Import db models to be used
+
+from models import *
 
 # login required decorator
 
@@ -82,7 +86,6 @@ def set_stock_data(stock):
 # views
 
 @app.route('/')
-# @login_required
 def home():
 	title = 'StockHawk'
 	return render_template('index.html', title=title)
@@ -115,10 +118,24 @@ def welcome():
 	title = 'StockHawk - Welcome'
 	return render_template('welcome.html', title=title)
 
+@app.route('/news')
+def news():
+	title = 'StockHawk - News'
+	return render_template('news.html', title=title)
+
 @app.route('/user')
 @login_required
 def user():
 	title = 'StockHawk - Account'
+	
+# commenting this out for now so it doesn't break my 
+# production server (heroku), which doesn't have db yet.
+# also removing 'user=user' in render_template line below, as 
+# well as corresponding template account.html
+
+	# users = User.query.all()
+	# user = User.query.filter_by(name='adam').first()
+
 	return render_template('account.html', title=title)
 
 @app.route('/stocks', methods=['GET', 'POST'])
