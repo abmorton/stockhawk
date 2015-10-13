@@ -128,6 +128,10 @@ def login_required(f):
 
 # views
 
+@app.errorhandler(404)
+def not_found(e):
+	return render_template('/404.html')
+
 @app.route('/')
 def home():
 	title = 'StockHawk'
