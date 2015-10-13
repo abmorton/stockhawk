@@ -37,7 +37,7 @@
 	{% endfor %}
 </table>
 <br>
-<h4>Here is the User table (passwords not displayed), sorted by most recently seen:</h4>
+<h4>Here is the User table (emails and passwords are obfuscated), sorted by most recently seen:</h4>
 <br>
 <table class="db_view">
 	<tr class="tableheader">
@@ -51,7 +51,7 @@
 	<tr>
 		<td>{{ user.id }}</td>
 		<td>{{ user.name }}</td>
-		<td>{{ user.email }}</td>
+		<td>***@***.***</td>
 		<td>********</td>
 		<td>{{ user.last_seen }}</td>
 	</tr>
