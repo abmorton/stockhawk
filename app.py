@@ -14,7 +14,7 @@ import config
 # Instatiate and configure app:
 app = Flask(__name__)
 
-app.config.from_object('config.DevConfig')
+app.config.from_object('config.ProductionConfig')
 
 # ------------------------------------------------------------------
 
