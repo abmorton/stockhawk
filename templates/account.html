@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Hi - this is your account page</h1>
+<h1>{{ user.name }}Account page</h1>
 <br>
-<p>There's nothing here yet. Eventually, we'll have:</p>
+<p>There's nothing here yet, but thanks for registering and logging in! Eventually, we'll have:</p>
 <ul>
 	<li>Email/password management</li>
 	<li>Avatars</li>
 	<li>User profile page? (could be a different page)</li>
 </ul>
+<br>
+<h4>In the meantime, check out the <a href="/stocks">stock search</a> page - it works!</h4>
 
 {% endblock %}

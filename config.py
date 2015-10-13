@@ -1,12 +1,15 @@
-# class BaseConfig(object):
+import os
+
+class BaseConfig(object):
+	DEBUG = False
+	WTF_CSRF_ENABLED = True
+	SECRET_KEY = 'Hvee95a202[a1d'
+
+class DevConfig(BaseConfig):
+	DEBUG = True
+	SQLALCHEMY_DATABASE_URI = 'sqlite:///flaskpractice.db'
+	# SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+
+# class ProductionConfig(BaseConfig):
 # 	DEBUG = False
-# 	SECRET_KEY = 'Hv\xee\x95\xa2\x02[\xa1\xd'
-# 	SQLALCHEMY_DATABASE_URI = 'sqlite:///practice.db'
-
-
-# class DevConfig(BaseConfig):
-# 	DEBUG = True
-
-DEBUG = False
-SECRET_KEY = 'Hv\xee\x95\xa2\x02[\xa1\xd'
-# SQLALCHEMY_DATABASE_URI = 'sqlite:///practice.db'
+# 	SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']

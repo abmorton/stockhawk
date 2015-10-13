@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<h3>This page is to satisfy the viewer's curiosity about how this site is set up, and for my convenience while developing the application and database. Obviously, I'll take it down once I launch the app and start getting real data.</h3>
+<br>
+<h4>Here are the stocks we have in the database so far, sorted by search popularity:</h4>
+	
+<br>
+<table class="db_view">
+	<tr class="tableheader">
+		<td>ID</td>
+		<td>Name</td>
+		<td>Symbol</td>
+		<td>Exchange</td>
+		<td>Price</td>
+		<td>Div_yield</td>
+		<td>Ex_div</td>
+		<td>Div_pay</td>
+		<td>Market_cap</td>
+		<td>View_count</td>
+	</tr>
+	{% for stock in stocks %}
+	<tr>
+		<td>{{ stock.id }}</td>
+		<td>{{ stock.name }}</td>
+		<td>{{ stock.symbol }}</td>
+		<td>{{ stock.exchange }}</td>
+		<td>{{ stock.price }}</td>
+		<td>{{ stock.div_yield }}</td>
+		<td>{{ stock.ex_div }}</td>
+		<td>{{ stock.div_pay }}</td>
+		<td>{{ stock.market_cap }}</td>
+		<td>{{ stock.view_count }}</td>
+	</tr>
+	{% endfor %}
+</table>
+<br>
+<h4>Here is the User table (passwords not displayed), sorted by most recently seen:</h4>
+<br>
+<table class="db_view">
+	<tr class="tableheader">
+		<td>ID</td>
+		<td>Name</td>
+		<td>Email</td>
+		<td>Password</td>
+		<td>Last seen</td>
+	</tr>
+	{% for user in users %}
+	<tr>
+		<td>{{ user.id }}</td>
+		<td>{{ user.name }}</td>
+		<td>{{ user.email }}</td>
+		<td>********</td>
+		<td>{{ user.last_seen }}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+<br>
+<br>
+<p><a href="/stocks">Search</a> for more stocks to add to my database!</p>
+
+{% endblock %}

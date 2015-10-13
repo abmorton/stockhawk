@@ -3,9 +3,29 @@
 
 <h1>{{ title }}</h1>
 
-<h3>Releases</h3>
-<br>
+<h3>Release log</h3>
 
+<div class="release">
+	<span class="date">10/12/15</span>
+	<span class="release_num">Alpha 0.13</span>
+	<ul class="newfeatures">
+		<li>Added registration page and functionality; instead of only allowing hard-coded "admin/admin" credentials to work, login is database-based.</li>
+		<li>Added "last seen" datetime object to User class.</li>
+		<li>Added User table to database preview page.</li>
+		<li>Added "most popular stock searches" feature on stock page.</li>
+	</ul>
+</div>
+
+<div class="release">
+	<span class="date">10/11/15</span>
+	<span class="release_num">Alpha 0.12</span>
+	<ul class="newfeatures">
+		<li>Connecteted application to database server. Persistence!</li>
+		<li>Created data model for stock, inserted some data.</li>
+		<li>Converted dates (dividend paydates, e.g.) from strings to python datetime format for entry into database and logic that will come later.
+		<li>Added database preview page (mostly for development purposes.)</li>
+	</ul>
+</div>
 
 <div class="release">
 	<span class="date">10/10/15</span>
