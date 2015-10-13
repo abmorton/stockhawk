@@ -9,6 +9,6 @@ class DevConfig(BaseConfig):
 	DEBUG = True
 	SQLALCHEMY_DATABASE_URI = 'sqlite:///flaskpractice.db'
 
-class ProductionConfig(BaseConfig):
+class ProdConfig(BaseConfig):
 	DEBUG = False
 	SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
