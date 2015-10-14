@@ -14,7 +14,7 @@ import config
 # Instatiate and configure app:
 app = Flask(__name__)
 
-app.config.from_object('config.ProdConfig')
+app.config.from_object('config.DevConfig')
 
 # ------------------------------------------------------------------
 
@@ -215,10 +215,10 @@ def db_view():
 	stocks = Stock.query.all()
 	users = User.query.all()
 	trades = Trade.query.all()
+	portfolios = Portfolio.query.all()
 
 	# for the time being, pass empty portfolios and positions
 	positions = []
-	portfolios = []
 
 	return render_template("db_view.html", title=title, stocks=stocks, users=users, trades=trades, positions=positions, portfolios=portfolios)
 

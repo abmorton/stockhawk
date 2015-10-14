@@ -2,9 +2,6 @@ from app import db
 from models import *
 import datetime
 
-# setting up SQLAlchemy db 
-
-
 # create the db and tables
 
 db.create_all()
@@ -21,20 +18,24 @@ yesterday = datetime.date(now.year, now.month, 13)
 
 # insert data
 adam = User("adam", "abmorton@gmail.com", "testpw", yesterday)
-db.session.add(User("admin", "admin@admin.com", "adminpw", today))
-# db.session.add(User(adam))
-
-db.session.add(Stock("XOMA", "XOMA Corporation", "NGM", "0.9929", None, None, None, "117.74M", 1))
+# db.session.add(User("admin", "admin@admin.com", "adminpw", today))
+db.session.add(User(adam))
 db.session.commit()
-# prepare more data to insert, using ForeignKeys and relationship()
-
-stock = Stock.query.get(1)
 
 # make a Portfolio 
 
 port = Portfolio(adam.id)
 db.session.add(port)
 db.session.commit()
+
+# add a stock
+
+db.session.add(Stock("XOMA", "XOMA Corporation", "NGM", "0.9929", None, None, None, "117.74M", 1))
+db.session.commit()
+
+# get a stock instance for later use creating other records
+stock = Stock.query.get(1)
+
 
 # make some trades
 db.session.add(Trade(stock.symbol, 1, 10, yesterday, None, None, None))

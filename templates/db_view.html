@@ -3,8 +3,7 @@
 
 <h1>{{ title }}</h1>
 
-<h4>The purpose of this page is to satisfy the viewer's curiosity about how this site is set up, and for my convenience while developing the application and database. <span class="primary">Primary</span>, <span class="foreign">foreign</span>, and <span class="relationship">relationship</span> keys are indicated. Note that <span class="relationship">relationship</span> keys are not registered in the tables and store no data.</h4>
-<br>
+<h5>The purpose of this page is to satisfy the viewer's curiosity about how this site is set up, and for my convenience while developing the application and database. <span class="primary">Primary</span>, <span class="foreign">foreign</span>, and <span class="relationship">relationship</span> keys are indicated. Note that <span class="relationship">relationship</span> keys are not registered in the tables and store no data.</h5>
 <h4>Table of <span class="strike">Contents</span> <span class="code">tables</span></h4>
 <ol>
 	<li class="toc"><a href="#stocks">Stocks</a></li>
@@ -147,7 +146,7 @@
 			<tr>
 				<td class="primary">{{ portfolio.id }}</td>
 				<td class="foreign">{{ portfolio.user_id }}</td>
-				<td class="relationship">{{ portfolio.positions }}</td>		
+				<td class="relationship"></td>		
 			</tr>
 			{% endfor %}
 		</table>
