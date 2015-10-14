@@ -3,62 +3,156 @@
 
 <h1>{{ title }}</h1>
 
-<h4>The purpose of this page is to satisfy the viewer's curiosity about how this site is set up, and for my convenience while developing the application and database. Obviously, I'll take it down once I launch the app and start getting real data.</h4>
+<h4>The purpose of this page is to satisfy the viewer's curiosity about how this site is set up, and for my convenience while developing the application and database. <span class="primary">Primary</span>, <span class="foreign">foreign</span>, and <span class="relationship">relationship</span> keys are indicated. Note that <span class="relationship">relationship</span> keys are not registered in the tables and store no data.</h4>
 <br>
-<h4>Here are the stocks we have in the database so far, sorted by search popularity:</h4>
-	
+<h4>Table of <span class="strike">Contents</span> <span class="code">tables</span></h4>
+<ol>
+	<li class="toc"><a href="#stocks">Stocks</a></li>
+	<li class="toc"><a href="#users">Users</a></li>
+	<li class="toc"><a href="#trades">Trades</a></li>
+	<li class="toc"><a href="#positions">Positions</a></li>
+	<li class="toc"><a href="#portfolios">Portfolios</a></li>
+</ol>
 <br>
-<table class="db_view">
-	<tr class="tableheader">
-		<td>ID</td>
-		<td>Name</td>
-		<td>Symbol</td>
-		<td>Exchange</td>
-		<td>Price</td>
-		<td>Div_yield</td>
-		<td>Ex_div</td>
-		<td>Div_pay</td>
-		<td>Market_cap</td>
-		<td>View_count</td>
-	</tr>
-	{% for stock in stocks %}
-	<tr>
-		<td>{{ stock.id }}</td>
-		<td>{{ stock.name }}</td>
-		<td>{{ stock.symbol }}</td>
-		<td>{{ stock.exchange }}</td>
-		<td>{{ stock.price }}</td>
-		<td>{{ stock.div_yield }}</td>
-		<td>{{ stock.ex_div }}</td>
-		<td>{{ stock.div_pay }}</td>
-		<td>{{ stock.market_cap }}</td>
-		<td>{{ stock.view_count }}</td>
-	</tr>
-	{% endfor %}
-</table>
-<br>
-<h4>Here is the User table (emails and passwords are obfuscated), sorted by most recently seen:</h4>
-<br>
-<table class="db_view">
-	<tr class="tableheader">
-		<td>ID</td>
-		<td>Name</td>
-		<td>Email</td>
-		<td>Password</td>
-		<td>Last seen</td>
-	</tr>
-	{% for user in users %}
-	<tr>
-		<td>{{ user.id }}</td>
-		<td>{{ user.name }}</td>
-		<td>***@***.***</td>
-		<td>********</td>
-		<td>{{ user.last_seen }}</td>
-	</tr>
-	{% endfor %}
-</table>
 
-<br>
+<ol>
+	<li><a name="stocks"></a>
+		<p>The <span class="code">stocks</span> table is the core of the application. <span class="primary">id</span> is the primary key, <span class="relationship">trades</span> is a one-to-many relationship with the <span class="code">trades</span> table:</p>
+		<br>
+		<table class="db_view">
+			<tr class="tableheader">
+				<td class="primary">id</td>
+				<td>symbol</td>
+				<td>name</td>
+				<td>exchange</td>
+				<td>Price</td>
+				<td>div_yield</td>
+				<td>ex_div</td>
+				<td>div_pay</td>
+				<td>market_cap</td>
+				<td>view_count</td>
+				<td class="relationship">trades</td>
+			</tr>
+			{% for stock in stocks %}
+			<tr>
+				<td class="primary">{{ stock.id }}</td>
+				<td>{{ stock.symbol }}</td>
+				<td>{{ stock.name }}</td>
+				<td>{{ stock.exchange }}</td>
+				<td>{{ stock.price }}</td>
+				<td>{{ stock.div_yield }}</td>
+				<td>{{ stock.ex_div }}</td>
+				<td>{{ stock.div_pay }}</td>
+				<td>{{ stock.market_cap }}</td>
+				<td>{{ stock.view_count }}</td>
+				<td class="relationship"></td>
+			</tr>
+			{% endfor %}
+		</table>
+	</li>
+		<br>
+	<li><a name="users"></a>
+		<p>The <span class="code">user</span> table (emails and passwords are obfuscated). <span class="relationship">portfolio</span> is a one-to-one relationship with the <span class="code">portfolio</span> table.</p>
+		<br>
+		<table class="db_view">
+			<tr class="tableheader">
+				<td class="primary">id</td>
+				<td>name</td>
+				<td>email</td>
+				<td>password</td>
+				<td>last_seen</td>
+				<td class="relationship">portfolio</td>
+			</tr>
+			{% for user in users %}
+			<tr>
+				<td class="primary">{{ user.id }}</td>
+				<td>{{ user.name }}</td>
+				<td>***@***.***</td>
+				<td>********</td>
+				<td>{{ user.last_seen }}</td>
+				<td class="relationship"></td>
+			</tr>
+			{% endfor %}
+		</table>
+	</li>
+		<br>
+	<li><a name="trades"></a>
+		<p>The <span class="code">trades</span> table, integral to the stock game mechanics. <span class="primary">id</span> is the primary key, <span class="foreign">symbol_id</span> and <span class="foreign">position_id</span> are foreign keys to <span class="code">stocks</span> and <span class="code">positions</span>, respectively.</p>
+		<br>
+		<table class="db_view">
+			<tr class="tableheader">
+				<td class="primary">id</td>
+				<td class="foreign">symbol_id</td>
+				<td class="foreign">position_id</td>
+				<td>price</td>
+				<td>quantity</td>
+				<td>date</td>
+				<td>div_yield</td>
+				<td>ex_div</td>
+				<td>div_pay</td>
+			</tr>
+			{% for trade in trades %}
+			<tr>
+				<td class="primary">{{ trade.id }}</td>
+				<td class="foreign">{{ trade.symbol_id }}</td>
+				<td class="foreign">{{ trade.position_id }}</td>
+				<td>{{ trade.price }}</td>
+				<td>{{ trade.quantity }}</td>
+				<td>{{ trade.date }}</td>
+				<td>{{ trade.div_yield}}</td>
+				<td>{{ trade.ex_div }}</td>
+				<td>{{ trade.div_pay }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</li>
+		<br>
+	<li><a name="positions"></a>
+		<p>The <span class="code">positions</span> table, which stores <span class="code">trades</span> of a particular stock. <span class="primary">id</span> is primary key, <span class="foreign">portfolio</span> is foreign key linking to <span class="code">portfolios</span>, <span class="relationship">trades</span> is a one-to-many key linking to <span class="code">trades</span>.</p>
+		<table class="db_view">
+			<tr class="tableheader">
+				<td class="primary">id</td>
+				<td class="foreign">portfolio_id</td>
+				<td class="relationship">trades</td>		
+				<td>cost</td>
+				<td>value</td>
+				<td>date</td>
+				<td>sharecount</td>
+				<td>div_eligible_sharecount</td>
+			</tr>
+			{% for position in positions %}
+			<tr>
+				<td class="primary">{{ position.id }}</td>
+				<td class="foreign">{{ position.portfolio_id }}</td>
+				<td class="relationship">trades</td>		
+				<td>{{ position.cost }}</td>
+				<td>{{ position.value }}</td>
+				<td>{{ position.date }}</td>
+				<td>{{ position.sharecount }}</td>
+				<td>{{ position.div_eligible_sharecount }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</li>
+		<br>
+	<li><a name="portfolios"></a>
+		<p>The <span class="code">portfolios</span> table, which stores the various <span class="code">positions</span> of stocks owned by the user. <span class="primary">id</span> is primary key, <span class="foreign">user_id</span> is foreign key linking to <span class="code">users</span>, <span class="relationship">positions</span> is a one-to-many key linking to <span class="code">positions</span>.</p>
+		<table class="db_view">
+			<tr class="tableheader">
+				<td class="primary">id</td>
+				<td class="foreign">user_id</td>
+				<td class="relationship">positions</td>
+			</tr>
+			{% for portfolio in portfolios %}
+			<tr>
+				<td class="primary">{{ portfolio.id }}</td>
+				<td class="foreign">{{ portfolio.user_id }}</td>
+				<td class="relationship">{{ portfolio.positions }}</td>		
+			</tr>
+			{% endfor %}
+		</table>
+	</li>
+</ol>
 <br>
 <p><a href="/stocks">Search</a> for more stocks to add to my database!</p>
 

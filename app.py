@@ -14,7 +14,7 @@ import config
 # Instatiate and configure app:
 app = Flask(__name__)
 
-app.config.from_object('config.ProdConfig')
+app.config.from_object('config.DevConfig')
 
 # ------------------------------------------------------------------
 
@@ -211,10 +211,16 @@ def logout():
 
 @app.route('/db_view')
 def db_view():
-	title = 'Database preview'
-	stocks = Stock.query.order_by(desc(Stock.view_count))
-	users = User.query.order_by(desc(User.last_seen))
-	return render_template("db_view.html", title=title, stocks=stocks, users=users)
+	title = 'Under the hood'
+	stocks = Stock.query.all()
+	users = User.query.all()
+	trades = Trade.query.all()
+
+	# for the time being, pass empty portfolios and positions
+	positions = []
+	portfolios = []
+
+	return render_template("db_view.html", title=title, stocks=stocks, users=users, trades=trades, positions=positions, portfolios=portfolios)
 
 @app.route('/welcome')
 def welcome():
@@ -247,7 +253,7 @@ def user():
 
 @app.route('/stocks', methods=['GET', 'POST'])
 def stocks():
-	title = 'Stock lookup'	
+	title = 'StockHawk'	
 	stock = None
 	form = StockSearchForm(request.form)
 
