@@ -13,8 +13,13 @@
         <li><a href="/">About</a></li>
         <li><a href="/news">News</a></li>
         <li><a href="/db_view">Dev</a></li>
-        <li><a href="/user">Account</a></li>
+        {% if not loggedin_user %}
+        <li><a href="/login">Sign in</a></li>
+        {% endif %}
+        {% if loggedin_user %}
+        <li><a href="/user">{{ loggedin_user }}</a></li>
         <li><a href="/logout">Log out</a></li>
+        {% endif %}
       </ul>
     </header>
     <div class="container">
@@ -29,10 +34,7 @@
       {% endif %}
 
       <!-- child template -->
-      
       {% block content %}{% endblock %}
-
     </div>
-
   </body>
 </html>

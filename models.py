@@ -60,13 +60,15 @@ class Portfolio(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	# 1:1 relationship set up on users side
 	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	cash = db.Column(db.Numeric)
 	positions = db.relationship('Position', backref='portfolios', lazy='dynamic')
 
-	def __init__(self, user_id):
+	def __init__(self, user_id, cash):
 		self.user_id = user_id
+		self.cash = cash
 
 	def __repr__(self):
-		return 'id: {}, user_id: {}'.format(self.id, self.user_id)
+		return 'id: {}, user_id: {}, cash: {}'.format(self.id, self.user_id, self.cash)
 
 
 class Position(db.Model):

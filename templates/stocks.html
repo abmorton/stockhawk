@@ -1,19 +1,11 @@
 {% extends "base.html" %}
-  
 {% block content %}
 
-<!-- nonWTF form -->
-<!-- <form action="{{ url_for('stocks') }}" method="post">
-  <input type="text" placeholder="SYM" name="symbol" value="">
-  <input class="btn btn-default" type="submit" value="Login">
-</form> -->
 <h1>{{ title }}</h1>
-<br>
 <form action="{{ url_for('stocks') }}" method="post">
 	{{ form.hidden_tag() }}
 	<p>Search for a stock symbol:
 {{ form.stocklookup(size=8, autofocus="autofocus") }}
-
 	<input type="submit" value="Search"></p>
 </form>
 	<!-- display stock if there is one -->
@@ -81,10 +73,14 @@
 		</table>
 	</div>
 </div>
+<!-- 		{% for u in user %}
+			<p>let's start trading!</p>
+		{% endfor %}
+ -->
 	{% endif %}
 	
 	{% if not stock %}
-		<h3>Most popular stock searches:</h3>
+		<h4>Most popular stock searches:</h4>
 		<br>
 		<table class="stocklist">
 			<tr class="tableheader">

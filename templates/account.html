@@ -1,15 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>{{ user.name }}Account page</h1>
-<br>
-<p>There's nothing here yet, but thanks for registering and logging in! Eventually, we'll have:</p>
-<ul>
-	<li>Email/password management</li>
-	<li>Avatars</li>
-	<li>User profile page? (could be a different page)</li>
-</ul>
-<br>
-<h4>In the meantime, check out the <a href="/stocks">stock search</a> page - it works!</h4>
+<h1>{{ title }}</h1>
+<table>
+	<tr>
+		<td>Account value:</td>
+		<td>{{ value }}</td>
+	</tr>
+	<tr>
+		<td>Cash available:</td>
+		<td>{{ user.portfolio.cash }}</td>
+	</tr>
+	{% for position in positions %}
+	<tr>
+		<td>{{ position.sharecount }}</td>
+		<td>{{ position.quantity }}</td>
+		<td>{{ position.trades.symbol_id }}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+
+<h4><a href="/stocks">Make a trade</a></h4>
 
 {% endblock %}

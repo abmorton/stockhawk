@@ -131,12 +131,20 @@ def login_required(f):
 @app.errorhandler(404)
 def not_found(e):
 	flash('Resource not found.')
-	return render_template('/404.html')
+	if 'username' in session:
+		loggedin_user = session['username']
+	else:
+		loggedin_user = None
+	return render_template('/404.html', loggedin_user=loggedin_user)
 
 @app.route('/')
 def home():
-	title = 'StockHawk'
-	return render_template('index.html', title=title)
+	title = 'About StockHawk'
+	if 'username' in session:
+		loggedin_user = session['username']
+	else:
+		loggedin_user = None
+	return render_template('index.html', title=title, loggedin_user=loggedin_user)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -145,7 +153,7 @@ def register():
 
 	if request.method == 'POST' and form.validate():
 		now = datetime.datetime.now()
-		username = form.username.data
+		username = form.username.data.lower()
 		email = form.email.data
 		password = form.password.data
 		if User.query.filter_by(name=username).first() == None:
@@ -153,8 +161,15 @@ def register():
 				user = User(username, email, password, now)
 				db.session.add(user)
 				db.session.commit()
+
+				# create portfolio for the user at the same time
+				port = Portfolio(user.id, 1000000)
+				db.session.add(port)
+				db.session.commit()
+
 				session['logged_in'] = True
 				flash('Thanks for registering!')
+				flash('$1,000,000.00 was added to your account.')
 				flash('You were just logged in.')	
 				return redirect(url_for('user'))
 			else:
@@ -182,8 +197,8 @@ def login():
 			userpw = user.password
 			if userpw == form.password.data:
 				session['logged_in'] = True
-				# this line might break some logic.
-				# session['user'] = user
+				# experiment
+				session['username'] = request.form['username'] 
 				flash('You were just logged in.')			
 				user = User.query.filter_by(name=user.name).first()
 				user.last_seen = datetime.datetime.now()
@@ -206,26 +221,37 @@ def login():
 @login_required
 def logout():
 	session.pop('logged_in', None)
+	session.pop('username', None)
 	flash('You were just logged out.')
-	return redirect(url_for('home'))
+	return redirect(url_for('stocks'))
 
 @app.route('/db_view')
 def db_view():
-	title = 'Under the hood'
+	title = "Under the hood"
+
+	if 'username' in session:
+		loggedin_user = session['username']
+	else:
+		loggedin_user = None
+
 	stocks = Stock.query.all()
 	users = User.query.all()
 	trades = Trade.query.all()
 	portfolios = Portfolio.query.all()
+	positions = Position.query.all()
 
-	# for the time being, pass empty portfolios and positions
-	positions = []
-
-	return render_template("db_view.html", title=title, stocks=stocks, users=users, trades=trades, positions=positions, portfolios=portfolios)
+	return render_template("db_view.html", title=title, stocks=stocks, users=users, trades=trades, positions=positions, portfolios=portfolios, loggedin_user=loggedin_user)
 
 @app.route('/welcome')
 def welcome():
 	title = 'Welcome'
-	return render_template('welcome.html', title=title)
+
+	if 'username' in session:
+		loggedin_user = session['username']
+	else:
+		loggedin_user = None
+
+	return render_template('welcome.html', title=title, loggedin_user=loggedin_user)
 
 @app.route('/tos')
 def tos():
@@ -234,15 +260,29 @@ def tos():
 @app.route('/news')
 def news():
 	title = 'News'
-	return render_template('news.html', title=title)
+
+	if 'username' in session:
+		loggedin_user = session['username']
+	else:
+		loggedin_user = None
+
+	return render_template('news.html', title=title, loggedin_user=loggedin_user)
 
 @app.route('/user')
 @login_required
 def user():
-	title = 'Account'
-	# this line might break some logic.
-	# user = session['user']
-	return render_template('account.html', title=title, user=user)
+	if 'username' in session:
+		loggedin_user = session['username']
+		title = session['username']+"'s account page"
+		user = User.query.filter_by(name=session['username']).first()
+		portfolio = user.portfolio
+		positions = portfolio.positions.all()
+
+		value = user.portfolio.cash # change this to include port values
+
+	else:
+		return redirect(url_for('login'))
+	return render_template('account.html', title=title, user=user, loggedin_user=loggedin_user, value=value, positions=positions)
 
 # This is to dynamically create pages/urls/views for each stock queried.
 # Leaving it out for now, as it gets a little complicated with the db writes.
@@ -256,6 +296,7 @@ def stocks():
 	title = 'StockHawk'	
 	stock = None
 	form = StockSearchForm(request.form)
+	loggedin_user = None
 
 	if request.method == 'POST':
 		if form.validate():
@@ -283,8 +324,13 @@ def stocks():
 			return redirect(url_for('stocks'))	
 		return render_template('stocks.html', form=form, stock=stock, title=title, loss=loss)
 	elif request.method == 'GET':
+		
 		stocks = Stock.query.order_by(desc(Stock.view_count)).limit(10).all()
-		return render_template('stocks.html', form=form, stock=stock, stocks=stocks, title=title)
+
+		if 'username' in session:
+			loggedin_user = session['username'] 
+
+		return render_template('stocks.html', form=form, stock=stock, stocks=stocks, title=title, loggedin_user=loggedin_user)
 
 if __name__ == '__main__':
 	app.run()

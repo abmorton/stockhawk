@@ -3,17 +3,16 @@
 
 <h1>{{ title }}</h1>
 
-<h5>The purpose of this page is to satisfy the viewer's curiosity about how this site is set up, and for my convenience while developing the application and database. <span class="primary">Primary</span>, <span class="foreign">foreign</span>, and <span class="relationship">relationship</span> keys are indicated. Note that <span class="relationship">relationship</span> keys are not registered in the tables and store no data.</h5>
+<h5>The purpose of this page is to satisfy the viewer's curiosity about how this site is set up, as well as for my convenience while developing the application and database. <span class="primary">Primary</span>, <span class="foreign">foreign</span>, and <span class="relationship">relationship</span> keys are indicated. Note that <span class="relationship">relationship</span> keys are not actual tables fields and store no data, but are a representation of the relationship.</h5>
 <h4>Table of <span class="strike">Contents</span> <span class="code">tables</span></h4>
 <ol>
 	<li class="toc"><a href="#stocks">Stocks</a></li>
 	<li class="toc"><a href="#users">Users</a></li>
-	<li class="toc"><a href="#trades">Trades</a></li>
-	<li class="toc"><a href="#positions">Positions</a></li>
 	<li class="toc"><a href="#portfolios">Portfolios</a></li>
+	<li class="toc"><a href="#positions">Positions</a></li>
+	<li class="toc"><a href="#trades">Trades</a></li>
 </ol>
 <br>
-
 <ol>
 	<li><a name="stocks"></a>
 		<p>The <span class="code">stocks</span> table is the core of the application. <span class="primary">id</span> is the primary key, <span class="relationship">trades</span> is a one-to-many relationship with the <span class="code">trades</span> table:</p>
@@ -69,12 +68,62 @@
 				<td>***@***.***</td>
 				<td>********</td>
 				<td>{{ user.last_seen }}</td>
+				<td class="relationship">{{ user.portfolio }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</li>
+	<br>
+	<li><a name="portfolios"></a>
+		<p>The <span class="code">portfolios</span> table, which stores the various <span class="code">positions</span> of stocks owned by the user. <span class="primary">id</span> is primary key, <span class="foreign">user_id</span> is foreign key linking to <span class="code">users</span>, <span class="relationship">positions</span> is a one-to-many key linking to <span class="code">positions</span>.</p>
+		<br>
+		<table class="db_view">
+			<tr class="tableheader">
+				<td class="primary">id</td>
+				<td class="foreign">user_id</td>
+				<td>cash</td>
+				<td class="relationship">positions</td>
+			</tr>
+			{% for portfolio in portfolios %}
+			<tr>
+				<td class="primary">{{ portfolio.id }}</td>
+				<td class="foreign">{{ portfolio.user_id }}</td>
+				<td>{{ portfolio.cash }}</td>
 				<td class="relationship"></td>
 			</tr>
 			{% endfor %}
 		</table>
 	</li>
 		<br>
+	<li><a name="positions"></a>
+		<p>The <span class="code">positions</span> table, which stores <span class="code">trades</span> of a particular stock. <span class="primary">id</span> is primary key, <span class="foreign">portfolio</span> is foreign key linking to <span class="code">portfolios</span>, <span class="relationship">trades</span> is a one-to-many key linking to <span class="code">trades</span>.</p>
+		<br>
+		<table class="db_view">
+			<tr class="tableheader">
+				<td class="primary">id</td>
+				<td class="foreign">portfolio_id</td>
+				<td class="relationship">trades</td>		
+				<td>cost</td>
+				<td>value</td>
+				<td>date</td>
+				<td>sharecount</td>
+				<td>div_eligible_sharecount</td>
+			</tr>
+			{% for position in positions %}
+			<tr>
+				<td class="primary">{{ position.id }}</td>
+				<td class="foreign">{{ position.portfolio_id }}</td>
+				<td class="relationship">trades</td>		
+				<td>{{ position.cost }}</td>
+				<td>{{ position.value }}</td>
+				<td>{{ position.date }}</td>
+				<td>{{ position.sharecount }}</td>
+				<td>{{ position.div_eligible_sharecount }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</li>
+	<br>
 	<li><a name="trades"></a>
 		<p>The <span class="code">trades</span> table, integral to the stock game mechanics. <span class="primary">id</span> is the primary key, <span class="foreign">symbol_id</span> and <span class="foreign">position_id</span> are foreign keys to <span class="code">stocks</span> and <span class="code">positions</span>, respectively.</p>
 		<br>
@@ -106,51 +155,6 @@
 		</table>
 	</li>
 		<br>
-	<li><a name="positions"></a>
-		<p>The <span class="code">positions</span> table, which stores <span class="code">trades</span> of a particular stock. <span class="primary">id</span> is primary key, <span class="foreign">portfolio</span> is foreign key linking to <span class="code">portfolios</span>, <span class="relationship">trades</span> is a one-to-many key linking to <span class="code">trades</span>.</p>
-		<table class="db_view">
-			<tr class="tableheader">
-				<td class="primary">id</td>
-				<td class="foreign">portfolio_id</td>
-				<td class="relationship">trades</td>		
-				<td>cost</td>
-				<td>value</td>
-				<td>date</td>
-				<td>sharecount</td>
-				<td>div_eligible_sharecount</td>
-			</tr>
-			{% for position in positions %}
-			<tr>
-				<td class="primary">{{ position.id }}</td>
-				<td class="foreign">{{ position.portfolio_id }}</td>
-				<td class="relationship">trades</td>		
-				<td>{{ position.cost }}</td>
-				<td>{{ position.value }}</td>
-				<td>{{ position.date }}</td>
-				<td>{{ position.sharecount }}</td>
-				<td>{{ position.div_eligible_sharecount }}</td>
-			</tr>
-			{% endfor %}
-		</table>
-	</li>
-		<br>
-	<li><a name="portfolios"></a>
-		<p>The <span class="code">portfolios</span> table, which stores the various <span class="code">positions</span> of stocks owned by the user. <span class="primary">id</span> is primary key, <span class="foreign">user_id</span> is foreign key linking to <span class="code">users</span>, <span class="relationship">positions</span> is a one-to-many key linking to <span class="code">positions</span>.</p>
-		<table class="db_view">
-			<tr class="tableheader">
-				<td class="primary">id</td>
-				<td class="foreign">user_id</td>
-				<td class="relationship">positions</td>
-			</tr>
-			{% for portfolio in portfolios %}
-			<tr>
-				<td class="primary">{{ portfolio.id }}</td>
-				<td class="foreign">{{ portfolio.user_id }}</td>
-				<td class="relationship"></td>		
-			</tr>
-			{% endfor %}
-		</table>
-	</li>
 </ol>
 <br>
 <p><a href="/stocks">Search</a> for more stocks to add to my database!</p>
