@@ -329,7 +329,7 @@ def user():
 			stock_lookup_and_write(pos.symbol)
 			# I am pretty darned pleased with myself for getting this right on the first try. Getting the hang of it!
 			pos.value = Stock.query.filter_by(symbol=pos.symbol).first().price*pos.sharecount
-			db.session.commit()
+		db.session.commit()
 	else:
 		return redirect(url_for('login'))
 

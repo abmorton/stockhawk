@@ -7,4 +7,3 @@ heroku_setup_instructions.txt
 *.ipynb
 .ipynb_checkpoints/
 bugs.txt
-config.py
