@@ -2,25 +2,47 @@
 {% block content %}
 
 <h1>{{ title }}</h1>
+<div class="dashboard">
+<h4>Account dashboard</h4>
 <table>
 	<tr>
-		<td>Account value:</td>
+		<td class="tableheader">Account value: </td>
 		<td>{{ value }}</td>
 	</tr>
 	<tr>
-		<td>Cash available:</td>
-		<td>{{ user.portfolio.cash }}</td>
+		<td class="tableheader">Cash available: </td>
+		<td>{{ cash }}</td>
+	</tr>
+	<tr class="tableheader">
+		<td>Positions</td>
+	</tr>
+	<tr>
+		<!-- <td class="tableheader">Positions:</td> -->
+		<td class="tableheader">Stock</td>
+		<td class="tableheader">Shares</td>
+		<td class="tableheader">Value</td>
 	</tr>
 	{% for position in positions %}
-	<tr>
+	<tr class="stocklist">
+		<td>{{ position.symbol }}</td>
 		<td>{{ position.sharecount }}</td>
-		<td>{{ position.quantity }}</td>
-		<td>{{ position.trades.symbol_id }}</td>
+		<td>{{ position.prettyvalue }}</td>
 	</tr>
 	{% endfor %}
 </table>
+</div>
+<div class="tradebox">
+	<h4>Make a trade</h4>
+	{% from "_formhelpers.html" import render_field %}
+	<form action="{{ url_for('user') }}" method="post">
+		{{ form.hidden_tag() }}
 
+		{{ render_field(form.symbol) }}
+		{{ render_field(form.share_amount) }}
+		{{ render_field(form.buy_or_sell) }}
+		<input type="submit" value="Trade"></p>
+	</form>
+</div>
 
-<h4><a href="/stocks">Make a trade</a></h4>
 
 {% endblock %}

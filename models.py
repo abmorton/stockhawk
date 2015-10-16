@@ -62,6 +62,7 @@ class Portfolio(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	cash = db.Column(db.Numeric)
 	positions = db.relationship('Position', backref='portfolios', lazy='dynamic')
+	trades = db.relationship('Trade', backref='portfolios', lazy='dynamic')
 
 	def __init__(self, user_id, cash):
 		self.user_id = user_id
@@ -70,20 +71,22 @@ class Portfolio(db.Model):
 	def __repr__(self):
 		return 'id: {}, user_id: {}, cash: {}'.format(self.id, self.user_id, self.cash)
 
-
 class Position(db.Model):
 	__tablename__ = 'positions'
 
 	id = db.Column(db.Integer, primary_key=True)
 	portfolio_id = db.Column(db.Integer, db.ForeignKey('portfolios.id'))
+	symbol = db.Column(db.String)
 	cost = db.Column(db.Numeric)
 	value = db.Column(db.Numeric)
 	sharecount = db.Column(db.Integer)
 	div_eligible_sharecount = db.Column(db.Integer)
-	trades = db.relationship('Trade', backref='position', cascade="all, delete-orphan", lazy='dynamic')
+	# taking out cascade="all, delete-orphan" from trades
+	trades = db.relationship('Trade', backref='position', lazy='dynamic')
 
-	def __init__(self, portfolio_id, cost, value, sharecount, div_eligible_sharecount):
+	def __init__(self, portfolio_id, symbol, cost, value, sharecount, div_eligible_sharecount):
 		self.portfolio_id = portfolio_id
+		self.symbol = symbol
 		self.cost = cost
 		self.value = value
 		self.sharecount = sharecount
@@ -91,7 +94,7 @@ class Position(db.Model):
 		# self.trades = trades
 
 	def __repr__(self):
-		return 'id: {}, portfolio_id: {}'.format(self.id, self.portfolio_id)
+		return 'id: {}, portfolio_id: {}, symbol: {}, cost: {}, value: {} sharecount: {}'.format(self.id, self.portfolio_id, self.symbol, self.cost, self.value, self.sharecount)
 
 
 class Trade(db.Model):
@@ -99,7 +102,8 @@ class Trade(db.Model):
 
 	id = db.Column(db.Integer, primary_key=True)
 	symbol_id = db.Column(db.String, db.ForeignKey('stocks.symbol'), nullable=False, index=True)
-	position_id = db.Column(db.Integer, db.ForeignKey('positions.id'), nullable=False)
+	position_id = db.Column(db.Integer, db.ForeignKey('positions.id'))
+	portfolio_id = db.Column(db.Integer, db.ForeignKey('portfolios.id'))
 	price = db.Column(db.Numeric, nullable=False)
 	quantity = db.Column(db.Integer, nullable=False)
 	date = db.Column(db.Date, nullable=False)
@@ -107,9 +111,10 @@ class Trade(db.Model):
 	ex_div = db.Column(db.Date, nullable=True)
 	div_pay = db.Column(db.Date, nullable=True)
 
-	def __init__(self, symbol_id, price, quantity, date, div_yield, ex_div, div_pay):
+	def __init__(self, symbol_id, position_id, portfolio_id, price, quantity, date, div_yield, ex_div, div_pay):
 		self.symbol_id = symbol_id
 		self.position_id = position_id
+		self.portfolio_id = portfolio_id
 		self.price = price
 		self.quantity = quantity
 		self.date = date

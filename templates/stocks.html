@@ -2,12 +2,14 @@
 {% block content %}
 
 <h1>{{ title }}</h1>
-<form action="{{ url_for('stocks') }}" method="post">
-	{{ form.hidden_tag() }}
-	<p>Search for a stock symbol:
-{{ form.stocklookup(size=8, autofocus="autofocus") }}
-	<input type="submit" value="Search"></p>
-</form>
+{% if form %}
+	<form action="{{ url_for('stocks') }}" method="post">
+		{{ form.hidden_tag() }}
+		<p>Search for a stock symbol:
+		{{ form.stocklookup(size=8, autofocus="autofocus") }}
+		<input type="submit" value="Search"></p>
+	</form>
+{% endif %}
 	<!-- display stock if there is one -->
 	{% if stock %}
 <div id="stock">
@@ -73,12 +75,19 @@
 		</table>
 	</div>
 </div>
-<!-- 		{% for u in user %}
-			<p>let's start trading!</p>
-		{% endfor %}
+
+<!-- allow trading for logged in users once the mechanics are cleaned up -->
+
+<!-- 		{% if loggedin_user %}
+			<form action="{{ url_for('trade') }}" method="post">
+				{{ tradeform.hidden_tag() }}
+				{{ tradeform.share_amount }}
+				{{ tradeform.buy_or_sell }}
+				<input type="submit" value="Trade"></p>
+			</form>
+		{% endif %}
  -->
 	{% endif %}
-	
 	{% if not stock %}
 		<h4>Most popular stock searches:</h4>
 		<br>
@@ -93,7 +102,7 @@
 			<tr>
 				<td>{{ stock.symbol }}</td>
 				<td>{{ stock.name }}</td>
-				<td>{{ stock.price }}</td>
+				<td>{{ stock.prettyprice }}</td>
 				<td>{{ stock.market_cap }}</td>
 			</tr>
 		{% endfor %}

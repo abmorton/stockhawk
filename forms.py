@@ -1,5 +1,5 @@
 from flask.ext.wtf import Form
-from wtforms import TextField, BooleanField, PasswordField, validators
+from wtforms import TextField, BooleanField, PasswordField, RadioField, validators
 from wtforms.validators import Length, EqualTo, Email, Required
 
 # from wtforms import TextField, PasswordField, BooleanField, validators
@@ -20,3 +20,12 @@ class RegisterForm(Form):
 	accept_tos = BooleanField('I accept the Terms of Service (required)', validators=[Required(message='You must accept the Terms of Service to register and account.')])
 
 
+class TradeForm(Form):
+	amount = TextField('Number of shares', [validators.Length(min=1, max=15)])
+	buy_or_sell = RadioField('Buy or Sell', choices=[('buy','Buy'), ('sell','Sell')])
+
+
+class FullTradeForm(Form):
+	symbol = TextField('Stock symbol', [validators.Length(min=1, max=10)])
+	share_amount = TextField('Number of shares', [validators.Length(min=1, max=15)])
+	buy_or_sell = RadioField('Buy or Sell', choices=[('buy','Buy'), ('sell','Sell')])
