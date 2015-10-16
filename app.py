@@ -28,9 +28,18 @@ from models import *
 
 # helper functions to clean up app.py / view file
 
+# 
+def get_datetime_today():
+	now = datetime.datetime.now()
+	today = datetime.date(now.year, now.month, now.day)
+	return today
+
+# Converts numbers to $---,---,---.-- format and returns as string.
 def pretty_numbers(value):
 	return '${:,.2f}'.format(value)
 
+# Determines the color for gains/loses by passing a boolean value
+# to the html template
 def set_color(change):
 	if change < 0.0000000:
 		loss = True
@@ -119,23 +128,17 @@ def convert_yhoo_date(yhoo_date):
 		return None
 
 def write_stock_to_db(stock):
-	# get all stocks to make sure we're not trying to add something 
-	# that's already there. Eventually, I might want to update certain fields, 
+	# Eventually, I might want to update certain fields, 
 	# but here I'm creating whole new records at once and some of the fields are 'unique'
 	# so it's causing problems. Here, the input 'stock' argument is a stock object
 	# which has been passed through the set_stock_data function.
-	# it might be good to do this in a "if stock in stocks:"" kind of thing,
-	# but I'm not sure now
+	# it might be good to do this in a "if stock in stocks:"" kind of thing, but I'm not sure now
 
 	if Stock.query.filter_by(symbol=stock.symbol).first() == None:
 		db.session.add(Stock(stock.symbol, stock.name, stock.exchange, stock.price, \
 			stock.div, stock.ex_div, stock.div_pay, stock.market_cap, stock.view_count))
 		db.session.commit()
 	else:
-		# # need to convert these to datetimes
-		# stock.ex_div = convert_yhoo_date(stock.ex_div)
-		# stock.div_pay = convert_yhoo_date(stock.div_pay)
-
 		write_stock = Stock.query.filter_by(symbol=stock.symbol).first()
 		write_stock.view_count += 1
 		write_stock.price = stock.price
@@ -143,9 +146,16 @@ def write_stock_to_db(stock):
 		write_stock.ex_div = stock.ex_div
 		write_stock.div_pay = stock.div_pay
 		write_stock.market_cap = stock.market_cap
-
-		# need to update price, div_yield, ex_div, div_pay, market_cap in db as well
 		db.session.commit()
+
+# Look up a stock based on a 'cleaned' input string
+def stock_lookup_and_write(symbol):
+	stock = set_stock_data(Share(symbol))
+	# stock = set_stock_data(stock)
+	stock.prettyprice = pretty_numbers(stock.price)
+	stock.color = set_color(stock.change)
+	write_stock_to_db(stock)
+	return stock
 
 # login required decorator
 def login_required(f):
@@ -276,16 +286,16 @@ def db_view():
 
 	return render_template("db_view.html", title=title, stocks=stocks, users=users, trades=trades, positions=positions, portfolios=portfolios, loggedin_user=loggedin_user)
 
-@app.route('/welcome')
-def welcome():
-	title = 'Welcome'
+# @app.route('/welcome')
+# def welcome():
+# 	title = 'Welcome'
 
-	if 'username' in session:
-		loggedin_user = session['username']
-	else:
-		loggedin_user = None
+# 	if 'username' in session:
+# 		loggedin_user = session['username']
+# 	else:
+# 		loggedin_user = None
 
-	return render_template('welcome.html', title=title, loggedin_user=loggedin_user)
+# 	return render_template('welcome.html', title=title, loggedin_user=loggedin_user)
 
 @app.route('/tos')
 def tos():
@@ -309,26 +319,37 @@ def user():
 	if 'username' in session:
 		loggedin_user = session['username']
 		user = User.query.filter_by(name=session['username']).first()
+		portfolio = user.portfolio
+		positions = portfolio.positions.all()
 		title = session['username']+"'s account"
+		today = get_datetime_today()
+		# refresh current stock prices and therefore account value
+		# this might not work if there are no positions. check when you set up another test account.
+		for pos in user.portfolio.positions.all():
+			stock_lookup_and_write(pos.symbol)
+			# I am pretty darned pleased with myself for getting this right on the first try. Getting the hang of it!
+			pos.value = Stock.query.filter_by(symbol=pos.symbol).first().price*pos.sharecount
+			db.session.commit()
 	else:
 		return redirect(url_for('login'))
 
 	if request.method == 'GET':
 		# find the user's portfolio and positions
 		# later, I'll write a function to update the values for both
-		portfolio = user.portfolio
-		positions = portfolio.positions.all()
-	
+
 		# getting the cash and adding values of the positions below
 		value = user.portfolio.cash
 		for p in positions:
 			value += p.value
-		value = pretty_numbers(value)
-		cash = pretty_numbers(user.portfolio.cash)
-		for p in positions:
 			p.prettyvalue = pretty_numbers(p.value)
+			p.prettycost = pretty_numbers(p.cost)
+		portfolio.value = value
+		portfolio.prettyvalue = pretty_numbers(portfolio.value)
+		portfolio.prettycash = pretty_numbers(user.portfolio.cash)
 
-		return render_template('account.html', title=title, user=user, cash=cash, value=value, form=form, loggedin_user=loggedin_user, positions=positions)
+		db.session.commit() # not necessary?
+
+		return render_template('account.html', title=title, user=user, portfolio=portfolio, form=form, loggedin_user=loggedin_user, positions=positions)
 	
 	elif request.method == 'POST' and form.validate():
 		stock = Share(clean_stock_search(form.symbol.data))
@@ -348,13 +369,15 @@ def user():
 			# clean and turn into int
 			share_amount = clean_int_input(form.share_amount.data)
 			# price and total_cost should be float
-			price = (stock.price)
+			price = (stock.price) #I don't think this is strictly necessary. Waste of a line?
 			total_cost = float(share_amount*price)
 
 			# accept buy_or_sell from FullTradeForm, assign 1 or -1 multiplier
 			buy_or_sell = form.buy_or_sell.data
 			if buy_or_sell == 'buy':
+				# wants to buy
 				bs_mult = 1
+				total_cost = total_cost*bs_mult
 				# check to see if user has enough cash available
 				cash = float(user.portfolio.cash)
 
@@ -371,8 +394,6 @@ def user():
 						flash(" Opened position in " + stock.name + ".")
 
 						# now create trade (need datetime object)
-						now = datetime.datetime.now()
-						today = datetime.date(now.year, now.month, now.day)
 						trade = Trade(stock.symbol, position.id, user.portfolio.id, total_cost, share_amount, today, stock.div_yield, stock.ex_div, stock.div_pay)
 						db.session.add(trade)
 						# db.session.commit()
@@ -382,18 +403,14 @@ def user():
 						db.session.commit()
 						flash("Cash adjusted: -" + pretty_numbers(total_cost))
 
-						# pos = " Opened position in " + stock.symbol
-
 					elif user.portfolio.positions.filter_by(symbol=stock.symbol).all() != None:
 						# flash("You already have a position in " + stock.symbol + ".")
 						position = user.portfolio.positions.filter_by(symbol=stock.symbol).first()
 						# found the position, now adjust share count. maybe should do this via Trade?
 
-						now = datetime.datetime.now()
-						today = datetime.date(now.year, now.month, now.day)
 						trade = Trade(stock.symbol, position.id, user.portfolio.id, total_cost, share_amount, today, stock.div_yield, stock.ex_div, stock.div_pay)
 						db.session.add(trade)
-						flash("You bought " + str(share_amount) + " shares of " + stock.name + " at $" + str(price) + " per share.")
+						flash("You bought " + str(share_amount) + " shares of " + stock.name + " at " + pretty_numbers(price) + " per share.")
 						
 						user.portfolio.cash = new_cash
 						position.cost = float(position.cost) + total_cost
@@ -401,22 +418,43 @@ def user():
 						position.sharecount += share_amount
 
 						db.session.commit()
-						flash('Cash, position cost, value, sharecount adjusted.')
-
 				else:
 					can_buy = False
 					deficit = total_cost - cash
 					flash("Sorry, that costs "+ pretty_numbers(total_cost) + ", which is $" + str(deficit) + " more than you have available. Try buying fewer shares.")
 			else:
+				# wants to sell
 				bs_mult = -1
+				total_cost = total_cost*bs_mult
 				# check to see if there are enough stocks in the 
 				# position for this user's portfolio
-				# positions = str(user.portfolio.positions.trades.symbol_id)
-				# output = "Make sure you have enough shares to sell. Going to work on buys for now"
-				flash("Selling is not yet implemented, try again tomorrow!")
+				position = user.portfolio.positions.filter_by(symbol=stock.symbol).first()
 
+				if position != None:
+					if position.sharecount >= share_amount:
+						# flash("You have enough shares of that stock to sell!")
+						trade = Trade(stock.symbol, position.id, user.portfolio.id, total_cost, -1*share_amount, today, stock.div_yield, stock.ex_div, stock.div_pay)
+						db.session.add(trade)
+						flash("You sold " + str(share_amount) + " shares of " + stock.name + " at " + pretty_numbers(stock.price) + " per share. Adding " + pretty_numbers(total_cost*-1) + " to your cash balance.")
+
+						# update position
+						user.portfolio.cash = float(user.portfolio.cash) - total_cost
+						position.cost = float(position.cost) + total_cost
+						position.value = float(position.value) + total_cost
+						position.sharecount = position.sharecount + share_amount*bs_mult
+						#it might be worth refactoring this later, moving it above.
+
+						db.session.commit()
+						flash('Cash, position cost, value, sharecount adjusted.')
+					else:
+						flash("You only have " + str(position.sharecount) + " shares of " + str(stock.symbol) + ". Try selling fewer shares.")
+				else:
+					flash("You don't have any shares of " + stock.symbol + " to sell.")
+
+				flash("Selling is not yet totally implemented. Working on it!")
+			
 			return redirect(url_for('user'))
-
+	
 	elif request.method == 'POST' and not form.validate():
 		flash('Invalid values. Please try again.')
 		return redirect(url_for('user'))

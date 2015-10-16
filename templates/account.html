@@ -7,26 +7,29 @@
 <table>
 	<tr>
 		<td class="tableheader">Account value: </td>
-		<td>{{ value }}</td>
+		<td>{{ portfolio.prettyvalue }}</td>
 	</tr>
 	<tr>
 		<td class="tableheader">Cash available: </td>
-		<td>{{ cash }}</td>
+		<td>{{ portfolio.prettycash }}</td>
 	</tr>
 	<tr class="tableheader">
 		<td>Positions</td>
 	</tr>
 	<tr>
-		<!-- <td class="tableheader">Positions:</td> -->
 		<td class="tableheader">Stock</td>
 		<td class="tableheader">Shares</td>
 		<td class="tableheader">Value</td>
+		<td class="tableheader">Cost basis</td>
+		<td class="tableheader">Gain/(Loss)</td>
 	</tr>
 	{% for position in positions %}
 	<tr class="stocklist">
 		<td>{{ position.symbol }}</td>
 		<td>{{ position.sharecount }}</td>
 		<td>{{ position.prettyvalue }}</td>
+		<td>{{ position.prettycost }}</td>
+		<td>{{ position.gain_loss }}</td>
 	</tr>
 	{% endfor %}
 </table>
