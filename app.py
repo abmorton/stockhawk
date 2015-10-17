@@ -337,7 +337,6 @@ def user():
 		portfolio.value = value
 		portfolio.prettyvalue = pretty_numbers(portfolio.value)
 		portfolio.prettycash = pretty_numbers(user.portfolio.cash)
-
 		db.session.commit() # not necessary?
 
 		return render_template('account.html', title=title, user=user, portfolio=portfolio, form=form, loggedin_user=loggedin_user, positions=positions)
@@ -436,6 +435,7 @@ def user():
 						#it might be worth refactoring this later, moving it above.
 
 						# close position if sharecount == 0;
+						# this seems to work on my dev SQLite server, but not on Heroku's PostgreSQL server. It throws a 500 error.
 						if position.sharecount == 0:
 							db.session.delete(position)
 							flash("Your position in " + stock.name + " has been closed.")
