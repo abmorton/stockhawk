@@ -3,19 +3,18 @@
 
 <h1>{{ title }}</h1>
 <div class="dashboard">
-<h4>Account dashboard</h4>
+<h3>Account dashboard</h3>
 <table>
-	<tr>
-		<td class="tableheader">Account value: </td>
-		<td>{{ portfolio.prettyvalue }}</td>
-	</tr>
-	<tr>
-		<td class="tableheader">Cash available: </td>
-		<td>{{ portfolio.prettycash }}</td>
-	</tr>
 	<tr class="tableheader">
-		<td>Positions</td>
+		<td>Account value: </td>
+		<td>{{ portfolio.prettyvalue }}</td>
+		<td>Cash available: </td>
+		<td>{{ portfolio.prettycash }}</td>
+		<td></td>
 	</tr>
+<!-- 	<tr>
+		<td>Positions</td>
+	</tr> -->
 	<tr>
 		<td class="tableheader">Stock</td>
 		<td class="tableheader">Shares</td>

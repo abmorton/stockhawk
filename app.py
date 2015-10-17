@@ -321,6 +321,7 @@ def user():
 			# I am pretty darned pleased with myself for getting this right on the first try. Getting the hang of it!
 			pos.value = Stock.query.filter_by(symbol=pos.symbol).first().price*pos.sharecount
 		db.session.commit()
+
 	else:
 		return redirect(url_for('login'))
 
@@ -412,7 +413,7 @@ def user():
 				else:
 					can_buy = False
 					deficit = total_cost - cash
-					flash("Sorry, that costs "+ pretty_numbers(total_cost) + ", which is $" + str(deficit) + " more than you have available. Try buying fewer shares.")
+					flash("Sorry, that costs "+ pretty_numbers(total_cost) + ", which is " + pretty_numbers(deficit) + " more than you have available. Try buying fewer shares.")
 			else:
 				# wants to sell
 				bs_mult = -1
