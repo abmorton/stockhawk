@@ -201,7 +201,7 @@ def register():
 				db.session.commit()
 
 				# create portfolio for the user at the same time
-				port = Portfolio(user.id, 1000000)
+				port = Portfolio(user.id, 1000000, 1000000)
 				db.session.add(port)
 				db.session.commit()
 
@@ -310,40 +310,53 @@ def news():
 @login_required
 def user():
 	form = FullTradeForm(request.form)
-	if 'username' in session:
-		loggedin_user = session['username']
-		user = User.query.filter_by(name=session['username']).first()
-		portfolio = user.portfolio
-		positions = portfolio.positions.all()
-		title = session['username']+"'s account summary"
-		today = get_datetime_today()
-		# refresh current stock prices and therefore account value
-		# this might not work if there are no positions. check when you set up another test account.
-		for pos in user.portfolio.positions.all():
-			stock_lookup_and_write(pos.symbol)
-			# I am pretty darned pleased with myself for getting this right on the first try. Getting the hang of it!
-			pos.value = Stock.query.filter_by(symbol=pos.symbol).first().price*pos.sharecount
-		db.session.commit()
-	else:
-		return redirect(url_for('login'))
+	loggedin_user = session['username']
+	user = User.query.filter_by(name=session['username']).first()
+	portfolio = user.portfolio
+	positions = portfolio.positions.all()
+	title = session['username']+"'s account summary"
+	today = get_datetime_today()
+	value = portfolio.cash
+	total_gain_loss = float(0.00)
+	total_cost = float(0.00)
 
 	if request.method == 'GET':
-		# find the user's portfolio and positions
-		# later, I'll write a function to update the values for both
-
-		# getting the cash and adding values of the positions below
-		value = user.portfolio.cash
+		# refresh current stock prices and therefore account value
 		for p in positions:
-			value += p.value
+			# it might actually be worth taking the commit() out of the stock_lookup_and_write function, for cases such as this.
+			stock_lookup_and_write(p.symbol)
+			p.value = Stock.query.filter_by(symbol=p.symbol).first().price*p.sharecount
 			p.prettyvalue = pretty_numbers(p.value)
 			p.prettycost = pretty_numbers(p.cost)
+			# I previously had the below in a separate for loop:
+			value += p.value
+
 			p.gain_loss = p.value - p.cost
+			p.gain_loss_percent = p.gain_loss/p.cost*100
+
 			p.prettygain_loss = pretty_numbers(p.gain_loss)
-			p.gain_loss_percent = p.gain_loss/p.cost
+
+			
+			total_gain_loss = float(p.gain_loss) + total_gain_loss
+			total_cost = float(p.cost) + total_cost
+			
 			p.prettygain_loss_percent = pretty_percent(p.gain_loss_percent)
+
+		# find the user's portfolio and positions
+
+		# getting the cash and adding values of the positions below, maybe move some/all of this to the for loop above
+		portfolio.total_cost = total_cost
+		portfolio.prettytotal_cost = pretty_numbers(total_cost)
 		portfolio.value = value
+		# maybe actually store portfolio.value in db so we can do leaderboards
 		portfolio.prettyvalue = pretty_numbers(portfolio.value)
 		portfolio.prettycash = pretty_numbers(user.portfolio.cash)
+
+
+		portfolio.total_stock_value = portfolio.value - portfolio.cash
+		portfolio.prettytotal_stock_value = pretty_numbers(portfolio.total_stock_value)
+		portfolio.total_gain_loss = total_gain_loss
+		portfolio.prettytotal_gain_loss = pretty_numbers(portfolio.total_gain_loss)
 
 		db.session.commit() # not necessary?
 
@@ -496,6 +509,12 @@ def stocks():
 	stock = None
 	form = StockSearchForm(request.form)
 	tradeform = TradeForm(request.form)
+	stocks = Stock.query.order_by(desc(Stock.view_count)).limit(10).all()
+	leaders = Portfolio.query.order_by(desc(Portfolio.value)).limit(5).all()
+	
+	# This works in ipython, but I can't get it to show up on the template
+	for l in leaders:
+		l.prettyvalue = pretty_numbers(l.value)
 
 	if 'username' in session:
 		loggedin_user = session['username']
@@ -525,16 +544,16 @@ def stocks():
 				# need to convert these into python datetime objects
 				write_stock_to_db(stock)
 
-				return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, title=title, loss=loss, loggedin_user=loggedin_user)
+				# return redirect(url_for('stocks'))
+				return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, leaders=leaders, title=title, loss=loss, loggedin_user=loggedin_user)
 		elif not form.validate():
 			flash("Please enter a stock.")
 			return redirect(url_for('stocks'))
-		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, title=title, loss=loss, loggedin_user=loggedin_user)
+		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, leaders=leaders, title=title, loss=loss, loggedin_user=loggedin_user)
 	elif request.method == 'GET':
-		stocks = Stock.query.order_by(desc(Stock.view_count)).limit(10).all()
 		for s in stocks:
 			s.prettyprice = pretty_numbers(s.price)
-		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, title=title, loggedin_user=loggedin_user)
+		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, loggedin_user=loggedin_user)
 
 if __name__ == '__main__':
 	app.run()

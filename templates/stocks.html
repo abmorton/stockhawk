@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
+<div class="dashboard">
 <h1>{{ title }}</h1>
 {% if form %}
 	<form action="{{ url_for('stocks') }}" method="post">
@@ -76,6 +77,8 @@
 	</div>
 </div>
 
+
+
 <!-- allow trading for logged in users once the mechanics are cleaned up -->
 
 <!-- 		{% if loggedin_user %}
@@ -88,9 +91,10 @@
 		{% endif %}
  -->
 	{% endif %}
+
 	{% if not stock %}
 		<h4>Most popular stock searches:</h4>
-		<br>
+	<div class="stocklist">
 		<table class="stocklist">
 			<tr class="tableheader">
 				<td>Symbol</td>
@@ -107,5 +111,17 @@
 			</tr>
 		{% endfor %}
 		</table>
+	</div>
 	{% endif %}
+</div>
+
+<div id="leaderboard">
+	<p>Leaderboard</p>
+	<ol>
+		{% for l in leaders %}
+		<li>{{ l.owner.name }}: {{ l.value }}</li>
+		{% endfor %}
+	</ol>
+</div>
+
 {% endblock %}

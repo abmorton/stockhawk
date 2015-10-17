@@ -82,6 +82,7 @@
 				<td class="primary">id</td>
 				<td class="foreign">user_id</td>
 				<td>cash</td>
+				<td>value</td>
 				<td class="relationship">positions</td>
 			</tr>
 			{% for portfolio in portfolios %}
@@ -89,6 +90,7 @@
 				<td class="primary">{{ portfolio.id }}</td>
 				<td class="foreign">{{ portfolio.user_id }}</td>
 				<td>{{ portfolio.cash }}</td>
+				<td>{{ portfolio.value }}</td>
 				<td class="relationship"></td>
 			</tr>
 			{% endfor %}

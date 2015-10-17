@@ -61,15 +61,17 @@ class Portfolio(db.Model):
 	# 1:1 relationship set up on users side
 	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	cash = db.Column(db.Numeric)
+	value = db.Column(db.Numeric)
 	positions = db.relationship('Position', backref='portfolios', lazy='dynamic')
 	trades = db.relationship('Trade', backref='portfolios', lazy='dynamic')
 
-	def __init__(self, user_id, cash):
+	def __init__(self, user_id, cash, value):
 		self.user_id = user_id
 		self.cash = cash
+		self.value = value
 
 	def __repr__(self):
-		return 'id: {}, user_id: {}, cash: {}'.format(self.id, self.user_id, self.cash)
+		return 'id: {}, user_id: {}, cash: {}, value: {}'.format(self.id, self.user_id, self.cash, self.value)
 
 class Position(db.Model):
 	__tablename__ = 'positions'
