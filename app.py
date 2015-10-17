@@ -32,6 +32,9 @@ def get_datetime_today():
 def pretty_numbers(value):
 	return '${:,.2f}'.format(value)
 
+def pretty_percent(value):
+	return '{:,.2f}%'.format(value)
+
 # Determines the color for gains/loses by passing a boolean value
 # to the html template
 def set_color(change):
@@ -312,7 +315,7 @@ def user():
 		user = User.query.filter_by(name=session['username']).first()
 		portfolio = user.portfolio
 		positions = portfolio.positions.all()
-		title = session['username']+"'s account"
+		title = session['username']+"'s account summary"
 		today = get_datetime_today()
 		# refresh current stock prices and therefore account value
 		# this might not work if there are no positions. check when you set up another test account.
@@ -321,7 +324,6 @@ def user():
 			# I am pretty darned pleased with myself for getting this right on the first try. Getting the hang of it!
 			pos.value = Stock.query.filter_by(symbol=pos.symbol).first().price*pos.sharecount
 		db.session.commit()
-
 	else:
 		return redirect(url_for('login'))
 
@@ -335,9 +337,14 @@ def user():
 			value += p.value
 			p.prettyvalue = pretty_numbers(p.value)
 			p.prettycost = pretty_numbers(p.cost)
+			p.gain_loss = p.value - p.cost
+			p.prettygain_loss = pretty_numbers(p.gain_loss)
+			p.gain_loss_percent = p.gain_loss/p.cost
+			p.prettygain_loss_percent = pretty_percent(p.gain_loss_percent)
 		portfolio.value = value
 		portfolio.prettyvalue = pretty_numbers(portfolio.value)
 		portfolio.prettycash = pretty_numbers(user.portfolio.cash)
+
 		db.session.commit() # not necessary?
 
 		return render_template('account.html', title=title, user=user, portfolio=portfolio, form=form, loggedin_user=loggedin_user, positions=positions)
