@@ -434,14 +434,21 @@ def user():
 						position.sharecount = position.sharecount + share_amount*bs_mult
 						#it might be worth refactoring this later, moving it above.
 
+						# I'll remove this one if I can figure out the bug with Heroku's db.
+						db.session.commit()
+
 						# close position if sharecount == 0;
 						# this seems to work on my dev SQLite server, but not on Heroku's PostgreSQL server. It throws a 500 error.
 						if position.sharecount == 0:
-							db.session.delete(position)
-							flash("Your position in " + stock.name + " has been closed.")
+							try:
+								db.session.delete(position)
+								db.session.commit()
 
-						db.session.commit()
-						flash('Cash, position cost, value, sharecount adjusted.')
+								flash("Your position in " + stock.name + " has been closed.")
+							except:
+								flash("Your position in " + stock.name + " is now empty. I'm working on a way to remove it from the database.")
+
+
 					else:
 						flash("You only have " + str(position.sharecount) + " shares of " + str(stock.symbol) + ". Try selling fewer shares.")
 				else:
