@@ -30,7 +30,7 @@ class Stock(db.Model):
 		self.view_count = view_count
 
 	def __repr__(self):
-		return '<Stock : %r>' % (self.symbol)
+		return '<id: {}, symbol: {}, exchange: {}>'.format(self.id, self.symbol, self.exchange)
 
 
 class User(db.Model):
@@ -123,7 +123,7 @@ class Trade(db.Model):
 		self.div_pay = div_pay
 
 	def __repr__(self):
-		return 'id: {}, symbol_id: {}'.format(self.id, self.symbol_id)
+		return 'id: {}, symbol_id: {}, position_id: {}, portfolio_id {}'.format(self.id, self.symbol_id, position_id, portfolio_id)
 
 
 

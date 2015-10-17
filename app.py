@@ -424,7 +424,6 @@ def user():
 
 				if position != None:
 					if position.sharecount >= share_amount:
-						# flash("You have enough shares of that stock to sell!")
 						trade = Trade(stock.symbol, position.id, user.portfolio.id, total_cost, -1*share_amount, today, stock.div_yield, stock.ex_div, stock.div_pay)
 						db.session.add(trade)
 						flash("You sold " + str(share_amount) + " shares of " + stock.name + " at " + pretty_numbers(stock.price) + " per share. Adding " + pretty_numbers(total_cost*-1) + " to your cash balance.")
@@ -436,14 +435,17 @@ def user():
 						position.sharecount = position.sharecount + share_amount*bs_mult
 						#it might be worth refactoring this later, moving it above.
 
+						# close position if sharecount == 0;
+						if position.sharecount == 0:
+							db.session.delete(position)
+							flash("Your position in " + stock.name + " has been closed.")
+
 						db.session.commit()
 						flash('Cash, position cost, value, sharecount adjusted.')
 					else:
 						flash("You only have " + str(position.sharecount) + " shares of " + str(stock.symbol) + ". Try selling fewer shares.")
 				else:
 					flash("You don't have any shares of " + stock.symbol + " to sell.")
-
-				flash("Selling is not yet totally implemented. Working on it!")
 			
 			return redirect(url_for('user'))
 	
