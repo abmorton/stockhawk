@@ -10,25 +10,19 @@ import config
 # from helpers import set_color, clean_stock_search, set_stock_data, convert_yhoo_date, write_stock_to_db
 
 # --------------------------------------------------------------------
-
 # Instatiate and configure app:
 app = Flask(__name__)
 
 app.config.from_object('config.ProdConfig')
-
 # ------------------------------------------------------------------
-
 # create sqlalchemy object 
 db = SQLAlchemy(app)
 
 # Import db models to be used, AFTER creating db or it fails!
 from models import *
-
 # ------------------------------------------------------------------
-
 # helper functions to clean up app.py / view file
 
-# 
 def get_datetime_today():
 	now = datetime.datetime.now()
 	today = datetime.date(now.year, now.month, now.day)
@@ -59,19 +53,16 @@ def clean_stock_search(symbol):
 	return no_punct
 
 # This is to take out non-numeric characters from an integer input string.
-def clean_int_input(number):
-	punctuation = '''!()-[]{ };:'"\,<>./?@#$%^&*_~qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM'''
-	no_punct = ""
-	for char in number:
-		if char not in punctuation:
-			no_punct = no_punct + char
-			# no_punct = int(no_punct)
-# what to do if there aren't any numeric characters in the field
-		elif len(no_punct) == 0:
-			no_punct = 0
-			flash('Invalid quantity. Please try again.')
-	no_punct = int(no_punct)
-	return no_punct
+# Not needed at this point, using form validation instead.
+# def clean_int_input(number):
+# 	punctuation = '''!()-[]{ };:'"\,<>./?@#$%^&*_~-qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM'''
+# 	no_punct = ""
+# 	number = str(number)
+# 	for char in number:
+# 		if char not in punctuation:
+# 			no_punct = no_punct + char
+# 	no_punct = int(no_punct)
+# 	return no_punct
 
 # Puts various attributes into 'stock' via different Share methods.
 def set_stock_data(stock):
@@ -366,8 +357,9 @@ def user():
 			write_stock_to_db(stock)
 			# get actual stock in db
 			stock = Stock.query.filter_by(symbol=stock.symbol).first()
-			# clean and turn into int
-			share_amount = clean_int_input(form.share_amount.data)
+			# clean and turn into int (was using the clean_int() function above, 
+			# but now using a WTForm validator)
+			share_amount = form.share_amount.data
 			# price and total_cost should be float
 			price = (stock.price) #I don't think this is strictly necessary. Waste of a line?
 			total_cost = float(share_amount*price)

@@ -1,6 +1,6 @@
 from flask.ext.wtf import Form
-from wtforms import TextField, BooleanField, PasswordField, RadioField, validators
-from wtforms.validators import Length, EqualTo, Email, Required
+from wtforms import TextField, IntegerField, BooleanField, PasswordField, RadioField, validators
+from wtforms.validators import Length, EqualTo, Email, NumberRange, Required
 
 # from wtforms import TextField, PasswordField, BooleanField, validators
 
@@ -27,5 +27,5 @@ class TradeForm(Form):
 
 class FullTradeForm(Form):
 	symbol = TextField('Stock symbol', [validators.Length(min=1, max=10)])
-	share_amount = TextField('Number of shares', [validators.Length(min=1, max=15)])
+	share_amount = IntegerField('Number of shares', validators=[NumberRange(min=1, max=999999999999, message="Invalid share quantity. Please try again.")])
 	buy_or_sell = RadioField('Buy or Sell', choices=[('buy','Buy'), ('sell','Sell')])
