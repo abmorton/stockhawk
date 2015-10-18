@@ -122,6 +122,9 @@
 		<li>{{ l.owner.name }}: {{ l.value }}</li>
 		{% endfor %}
 	</ol>
+	{% if loggedin_user %}
+	<p>Your rank: {{ user.rank }}</p>
+	{% endif %}
 </div>
 
 {% endblock %}

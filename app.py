@@ -507,19 +507,29 @@ def trade():
 def stocks():
 	title = 'StockHawk'	
 	stock = None
+	if 'username' in session:
+		loggedin_user = session['username']
+		user = User.query.filter_by(name=session['username']).first()
+
+		allplayers = Portfolio.query.order_by(desc(Portfolio.value)).all()
+
+		for idx, val in enumerate(allplayers):
+			if user.portfolio == val:
+				user.rank = idx+1
+	else:
+		loggedin_user = None
+		user = None
+
 	form = StockSearchForm(request.form)
 	tradeform = TradeForm(request.form)
 	stocks = Stock.query.order_by(desc(Stock.view_count)).limit(10).all()
 	leaders = Portfolio.query.order_by(desc(Portfolio.value)).limit(5).all()
 	
+
+
 	# This works in ipython, but I can't get it to show up on the template
 	for l in leaders:
 		l.prettyvalue = pretty_numbers(l.value)
-
-	if 'username' in session:
-		loggedin_user = session['username']
-	else:
-		loggedin_user = None 
 
 	if request.method == 'POST':
 		if form.validate():
@@ -545,15 +555,15 @@ def stocks():
 				write_stock_to_db(stock)
 
 				# return redirect(url_for('stocks'))
-				return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, leaders=leaders, title=title, loss=loss, loggedin_user=loggedin_user)
+				return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, leaders=leaders, title=title, loss=loss, user=user, loggedin_user=loggedin_user)
 		elif not form.validate():
 			flash("Please enter a stock.")
 			return redirect(url_for('stocks'))
-		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, leaders=leaders, title=title, loss=loss, loggedin_user=loggedin_user)
+		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, leaders=leaders, title=title, loss=loss, user=user, loggedin_user=loggedin_user)
 	elif request.method == 'GET':
 		for s in stocks:
 			s.prettyprice = pretty_numbers(s.price)
-		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, loggedin_user=loggedin_user)
+		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user)
 
 if __name__ == '__main__':
 	app.run()
