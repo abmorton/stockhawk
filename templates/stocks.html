@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="dashboard">
 <h1>{{ title }}</h1>
+
+<div class="dashboard">
 {% if form %}
 	<form action="{{ url_for('stocks') }}" method="post">
 		{{ form.hidden_tag() }}
@@ -116,14 +117,15 @@
 </div>
 
 <div id="leaderboard">
-	<p>Leaderboard</p>
+	<h4>Leaderboard</h4>
 	<ol>
 		{% for l in leaders %}
-		<li>{{ l.owner.name }}: {{ l.value }}</li>
+		<li>{{ l.owner.name }}: <br>
+			{{ l.prettyvalue }}</li>
 		{% endfor %}
 	</ol>
 	{% if loggedin_user %}
-	<p>Your rank: {{ user.rank }}</p>
+	<h5>Your rank: {{ user.rank }}</h5>
 	{% endif %}
 </div>
 

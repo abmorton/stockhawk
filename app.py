@@ -35,6 +35,11 @@ def pretty_numbers(value):
 def pretty_percent(value):
 	return '{:,.2f}%'.format(value)
 
+def pretty_leaders(leaders):
+	for l in leaders:
+		l.prettyvalue = pretty_numbers(l.value)
+	return leaders
+
 # Determines the color for gains/loses by passing a boolean value
 # to the html template
 def set_color(change):
@@ -509,6 +514,7 @@ def stocks():
 	stock = None
 	if 'username' in session:
 		loggedin_user = session['username']
+		
 		user = User.query.filter_by(name=session['username']).first()
 
 		allplayers = Portfolio.query.order_by(desc(Portfolio.value)).all()
@@ -516,6 +522,8 @@ def stocks():
 		for idx, val in enumerate(allplayers):
 			if user.portfolio == val:
 				user.rank = idx+1
+
+
 	else:
 		loggedin_user = None
 		user = None
@@ -524,12 +532,13 @@ def stocks():
 	tradeform = TradeForm(request.form)
 	stocks = Stock.query.order_by(desc(Stock.view_count)).limit(10).all()
 	leaders = Portfolio.query.order_by(desc(Portfolio.value)).limit(5).all()
-	
+
+	leaders = pretty_leaders(leaders)
 
 
 	# This works in ipython, but I can't get it to show up on the template
-	for l in leaders:
-		l.prettyvalue = pretty_numbers(l.value)
+	# for l in leaders:
+	# 	l.prettyvalue = pretty_numbers(l.value)
 
 	if request.method == 'POST':
 		if form.validate():
