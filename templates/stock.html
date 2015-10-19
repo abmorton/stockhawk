@@ -81,6 +81,7 @@
 	{% endif %}
 <br>
 	{% if loggedin_user %}
+	<div class="tradecontrols">
 		<form action="{{ url_for('stock', symbol=stock.symbol) }}" method="post">
 			{{ tradeform.hidden_tag() }}
 			{{ tradeform.amount.label }}
@@ -88,6 +89,36 @@
 			{{ tradeform.buy_or_sell }}
 			<input type="submit" value="Trade"></p>
 		</form>
+	 </div>
+		
+		{% if position %}
+		<div class="stockposition">
+			<table>
+				<tr>
+					<td>Shares of {{ position.symbol }} owned: </td>
+					<td>{{ position.sharecount }}</td>
+				</tr>
+				<tr>
+					<td>Available cash: </td>
+					<td>{{ user.portfolio.cash }}</td>
+				</tr>
+			</table>
+		</div>
+		{% endif %}
+		{% if not position %}
+		<div class="stockposition">
+			<table>
+				<tr>
+					<td>You have no shares of {{ stock.name }}.</td>
+				</tr>
+				<tr>
+					<td>Available cash: </td>
+					<td>{{ user.portfolio.cash }}</td>
+				</tr>
+			</table>
+		</div>
+		{% endif %}
+
 	{% endif %}
 </div>
 

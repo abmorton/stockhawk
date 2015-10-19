@@ -429,6 +429,7 @@ def news():
 @login_reminder
 def leaderboard():
 	title = "Leaderboard"
+	flash("This page is under development. It will look nicer soon!")
 	loggedin_user = get_user()
 	user, allplayers, leaders = get_leaderboard(loggedin_user)
 
@@ -502,7 +503,6 @@ def stocks():
 		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user)
 
 @app.route('/stocks/<symbol>', methods=['GET', 'POST'])
-# @login_reminder
 def stock(symbol):
 	stock = Share(symbol)
 	if stock.get_price() == None:
@@ -519,9 +519,12 @@ def stock(symbol):
 	if user != None:
 		portfolio = user.portfolio
 		positions = portfolio.positions.all()
+		# This is to show many shares much of that particular stock a user has in his/her position.
+		position = portfolio.positions.filter_by(symbol=symbol).first()
 	else:
 		portfolio = None
 		positions = None
+		position = None
 
 	form = StockSearchForm(request.form)
 	tradeform = TradeForm(request.form)	
@@ -543,7 +546,7 @@ def stock(symbol):
 		flash("Invalid share amount; please try again.")
 		return redirect(url_for('stocks'))
 
-	return render_template('stock.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user)
+	return render_template('stock.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user, position=position)
 
 # @app.route('/welcome')
 # def welcome():

@@ -21,11 +21,11 @@ class RegisterForm(Form):
 
 
 class TradeForm(Form):
-	amount = IntegerField('Number of shares', [validators.NumberRange(min=1, max=9999999999999, message="Invalid share quantity. Please try again.")])
+	amount = IntegerField('Shares', [validators.NumberRange(min=1, max=9999999999999, message="Invalid share quantity. Please try again.")])
 	buy_or_sell = RadioField('Buy or Sell', choices=[('buy','Buy'), ('sell','Sell')])
 
 
 class FullTradeForm(Form):
 	symbol = TextField('Stock symbol', [validators.Length(min=1, max=10)])
-	share_amount = IntegerField('Number of shares', validators=[NumberRange(min=1, max=999999999999, message="Invalid share quantity. Please try again.")])
+	share_amount = IntegerField('Shares', validators=[NumberRange(min=1, max=999999999999, message="Invalid share quantity. Please try again.")])
 	buy_or_sell = RadioField('Buy or Sell', choices=[('buy','Buy'), ('sell','Sell')])

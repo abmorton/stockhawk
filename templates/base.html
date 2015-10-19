@@ -7,21 +7,21 @@
   </head>
   <body>
     <header>
-      <ul>
-<!--         <li><a href="/welcome">Welcome</a></li> -->
-        <li><a href="/stocks">Stocks</a></li>
-        <li><a href="/leaderboard">Leaderboard</a></li>
-        <li><a href="/">About</a></li>
-        <li><a href="/news">Releases</a></li>
-        <li><a href="/db_view">Backend</a></li>
-        {% if not loggedin_user %}
-        <li><a href="/login">Sign in</a></li>
-        {% endif %}
-        {% if loggedin_user %}
-        <li><a href="/user">{{ loggedin_user }}</a></li>
-        <li><a href="/logout">Log out</a></li>
-        {% endif %}
-      </ul>
+      <div id="headercontainer">
+        <span id="stockhawk"><a href="/stocks">StockHawk</a></span>
+        <ul>
+          <li><a href="/">About</a></li>
+          <li><a href="/news">Releases</a></li>
+          <li><a href="/db_view">Backend</a></li>
+          {% if not loggedin_user %}
+          <li><a href="/login">Sign in</a></li>
+          {% endif %}
+          {% if loggedin_user %}
+          <li><a href="/user">{{ loggedin_user }}</a></li>
+          <li><a href="/logout">Log out</a></li>
+          {% endif %}
+        </ul>
+      </div>
     </header>
     <div class="container">
       <!-- messages -->
