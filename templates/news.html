@@ -3,19 +3,29 @@
 
 <h1>{{ title }}</h1>
 
-<h3>Release log</h3>
+<!-- <h3>Release log</h3> -->
+
+<div class="release">
+	<span class="date">10/18/15</span>
+	<span class="release_num">Alpha 0.36</span>
+	<ul class="newfeatures">
+		<li>Added flash message with links to sign in/up for users who aren't signed in.</li>
+		<li>Fixed a bug which caused problems when trying to load the user page immediately after registration.</li>
+		<li>Dynamic generation of /stocks/(stock) pages.</li>
+		<li>Included dynamic links to dynamically created stock pages on the 'Most Popular Stock' list of the stock page.</li>
+		<li>Implemented trading on dynamically created stock pages.</li>
+	</ul>
+</div>
 
 <div class="release">
 	<span class="date">10/17/15</span>
-	<span class="release_num">Alpha - 0.35</span>
+	<span class="release_num">Alpha 0.35</span>
 	<ul class="newfeatures">
 		<li>Stock game leaderboards implemented on <a href="/stock">stock</a> page. This is the core concept of the game; champagne for everyone!</li>
 		<li>Indication of user's rank, even if they aren't at the top of the leaderboard.</li>
 		<li>Minor code refactoring, reducing amount writes to database and improving efficiency.</li>
 	</ul>
 </div>
-
-
 
 <div class="release">
 	<span class="date">10/16/15</span>

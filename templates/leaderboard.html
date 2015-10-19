@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ title }}</h1>
+<ol>
+{% for l in leaders %}
+
+<li>{{ l.owner.name }}: {{ l.prettyvalue }}</li>
+
+{% endfor %}
+ </ol>
+
+{% endblock %}

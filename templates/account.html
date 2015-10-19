@@ -17,7 +17,7 @@
 	</tr>
 	{% for position in positions %}
 	<tr class="stocklist">
-		<td>{{ position.symbol }}</td>
+		<td><a href="{{ url_for('stock', symbol=position.symbol) }}">{{ position.symbol }}</a></td>
 		<td>{{ position.sharecount }}</td>
 		<td>{{ position.prettyvalue }}</td>
 		<td>{{ position.prettycost }}</td>

@@ -3,16 +3,17 @@
   <head>
     <title>{{ title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href={{ url_for('static', filename='bootstrap.min.css') }} rel="stylesheet" media="screen">
   </head>
   <body>
     <header>
       <ul>
 <!--         <li><a href="/welcome">Welcome</a></li> -->
         <li><a href="/stocks">Stocks</a></li>
+        <li><a href="/leaderboard">Leaderboard</a></li>
         <li><a href="/">About</a></li>
-        <li><a href="/news">News</a></li>
-        <li><a href="/db_view">Dev</a></li>
+        <li><a href="/news">Releases</a></li>
+        <li><a href="/db_view">Backend</a></li>
         {% if not loggedin_user %}
         <li><a href="/login">Sign in</a></li>
         {% endif %}

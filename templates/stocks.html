@@ -18,11 +18,11 @@
 	<div id="summary">
 		<span id="name">{{ stock.name }} ({{ stock.symbol }})</span>
 		<span id="exchange"> - {{ stock.exchange }}</span><br>
-		<span id="price" >${{ stock.price }}</span>
-		{% if loss %}
+		<span id="price" >{{ stock.prettyprice }}</span>
+		{% if stock.loss %}
 		<span class="loss">{{ stock.change }} ({{ stock.percent_change }})</span><br>
 		{% endif %}
-		{% if not loss %}
+		{% if not stock.loss %}
 		<span id="change">{{ stock.change }} ({{ stock.percent_change }})</span><br>	
 		{% endif %}
 		<span id="afterhours">After hours: {{ stock.afterhours }}</span>
@@ -63,34 +63,21 @@
 				<td>Market Cap</td><td class="value">{{ stock.market_cap }}</td>
 			</tr>
 			<tr>
-				<td>P/E:</td><td class="value">${{ stock.peratio }}</td>
+				<td>P/E:</td><td class="value">{{ stock.prettyperatio }}</td>
 			</tr>
 			<tr>
 				<td>Div Yield:</td><td class="value">{{ stock.div }}%</td>	
 			</tr>
 			<tr>
-				<td>Ex Div:</td><td class="value">{{ stock.ex_div }}</td>
+				<td>Ex Div:</td><td class="value">{{ stock.prettyex_div }}</td>
 			</tr>
 			<tr>
-				<td>Div Pay Date:</td><td class="value">{{ stock.div_pay }}</td>
+				<td>Div Pay Date:</td><td class="value">{{ stock.prettydiv_pay }}</td>
 			</tr>
 		</table>
 	</div>
 </div>
 
-
-
-<!-- allow trading for logged in users once the mechanics are cleaned up -->
-
-<!-- 		{% if loggedin_user %}
-			<form action="{{ url_for('trade') }}" method="post">
-				{{ tradeform.hidden_tag() }}
-				{{ tradeform.share_amount }}
-				{{ tradeform.buy_or_sell }}
-				<input type="submit" value="Trade"></p>
-			</form>
-		{% endif %}
- -->
 	{% endif %}
 
 	{% if not stock %}
@@ -105,7 +92,7 @@
 			</tr>
 		{% for stock in stocks %}
 			<tr>
-				<td>{{ stock.symbol }}</td>
+				<td><a href="{{ url_for('stock', symbol=stock.symbol) }}">{{ stock.symbol }}</a></td>
 				<td>{{ stock.name }}</td>
 				<td>{{ stock.prettyprice }}</td>
 				<td>{{ stock.market_cap }}</td>
@@ -117,7 +104,7 @@
 </div>
 
 <div id="leaderboard">
-	<h4>Leaderboard</h4>
+	<h4><a href="/leaderboard">Leaderboard</a></h4>
 	<ol>
 		{% for l in leaders %}
 		<li>{{ l.owner.name }}: <br>

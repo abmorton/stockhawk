@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<div class="dashboard">
+{% if form %}
+	<form action="{{ url_for('stocks') }}" method="post">
+		{{ form.hidden_tag() }}
+		<p>Search for a stock symbol:
+		{{ form.stocklookup(size=8, autofocus="autofocus") }}
+		<input type="submit" value="Search"></p>
+	</form>
+{% endif %}
+	<!-- display stock if there is one -->
+{% if stock %}
+	<div id="stock">
+		<div id="summary">
+			<span id="name">{{ stock.name }} ({{ stock.symbol }})</span>
+			<span id="exchange"> - {{ stock.exchange }}</span><br>
+			<span id="price" >{{ stock.prettyprice }}</span>
+			{% if stock.loss %}
+			<span class="loss">{{ stock.change }} ({{ stock.percent_change }})</span><br>
+			{% endif %}
+			{% if not stock.loss %}
+			<span id="change">{{ stock.change }} ({{ stock.percent_change }})</span><br>	
+			{% endif %}
+			<span id="afterhours">After hours: {{ stock.afterhours }}</span>
+			<span id="last_traded">Last trade: {{ stock.last_traded }}</span>
+		</div>
+		<div id="stocktables">
+			<table>
+				<tr>
+					<td>Prev close:</td><td class="value">${{ stock.prev_close }}</td>
+				</tr>
+				<tr>
+					<td>Open:</td><td class="value">${{ stock.open }}</td>
+				</tr>
+				<tr>
+					<td>Bid:</td><td class="value">${{ stock.bid }}</td>
+				</tr>
+				<tr>
+					<td>Ask:</td><td class="value">${{ stock.ask }}</td>
+				</tr>
+				<tr>
+					<td>1y Target Est:</td><td class="value">${{ stock.yr_target }}</td>
+				</tr>
+				<tr>
+					<td>Volume:</td><td class="value">{{ stock.volume }}</td>
+				</tr>
+				<tr>
+					<td>Avg Vol:</td><td class="value">{{ stock.av_volume }}</td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<td>Day's Range:</td><td class="value">${{ stock.day_range }}</td>
+				</tr>
+				<tr>
+					<td>52wk Range:</td><td class="value">${{ stock.year_range }}</td>
+				</tr>
+				<tr>
+					<td>Market Cap</td><td class="value">{{ stock.market_cap }}</td>
+				</tr>
+				<tr>
+					<td>P/E:</td><td class="value">{{ stock.prettyperatio }}</td>
+				</tr>
+				<tr>
+					<td>Div Yield:</td><td class="value">{{ stock.div }}%</td>	
+				</tr>
+				<tr>
+					<td>Ex Div:</td><td class="value">{{ stock.prettyex_div }}</td>
+				</tr>
+				<tr>
+					<td>Div Pay Date:</td><td class="value">{{ stock.prettydiv_pay }}</td>
+				</tr>
+			</table>
+		</div>
+</div>
+
+	{% endif %}
+<br>
+	{% if loggedin_user %}
+		<form action="{{ url_for('stock', symbol=stock.symbol) }}" method="post">
+			{{ tradeform.hidden_tag() }}
+			{{ tradeform.amount.label }}
+			{{ tradeform.amount }}
+			{{ tradeform.buy_or_sell }}
+			<input type="submit" value="Trade"></p>
+		</form>
+	{% endif %}
+</div>
+
+<div id="leaderboard">
+	<h4><a href="/leaderboard">Leaderboard</a></h4>
+	<ol>
+		{% for l in leaders %}
+		<li>{{ l.owner.name }}: <br>
+			{{ l.prettyvalue }}</li>
+		{% endfor %}
+	</ol>
+	{% if loggedin_user %}
+	<h5>Your rank: {{ user.rank }}</h5>
+	{% endif %}
+</div>
+
+{% endblock %}

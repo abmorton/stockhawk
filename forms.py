@@ -21,7 +21,7 @@ class RegisterForm(Form):
 
 
 class TradeForm(Form):
-	amount = TextField('Number of shares', [validators.Length(min=1, max=15)])
+	amount = IntegerField('Number of shares', [validators.NumberRange(min=1, max=9999999999999, message="Invalid share quantity. Please try again.")])
 	buy_or_sell = RadioField('Buy or Sell', choices=[('buy','Buy'), ('sell','Sell')])
 
 
