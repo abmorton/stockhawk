@@ -135,10 +135,10 @@ def set_stock_data(stock):
 	stock.av_volume = stock.get_avg_daily_volume()
 	stock.day_low = stock.get_days_low()
 	stock.day_high = stock.get_days_high()
-	stock.day_range = stock.day_high+" - "+stock.day_low
+	stock.day_range = str(stock.day_high)+" - "+str(stock.day_low)
 	stock.year_high = stock.get_year_high()
 	stock.year_low = stock.get_year_low()
-	stock.year_range = stock.year_high+" - "+stock.year_low
+	stock.year_range = str(stock.year_high)+" - "+str(stock.year_low)
 	stock.market_cap = stock.data_set["MarketCapitalization"]
 	stock.peratio = stock.data_set["PERatio"]
 	if stock.peratio != None:
@@ -175,11 +175,9 @@ def convert_yhoo_date(yhoo_date):
 		return None
 
 def write_stock_to_db(stock):
-	# Eventually, I might want to update certain fields, 
-	# but here I'm creating whole new records at once and some of the fields are 'unique'
-	# so it's causing problems. Here, the input 'stock' argument is a stock object
+	# Here, the input 'stock' argument is a stock object
 	# which has been passed through the set_stock_data function.
-	# it might be good to do this in a "if stock in stocks:"" kind of thing, but I'm not sure now
+	# it might be worth taking the commit()s outside of the function
 	if Stock.query.filter_by(symbol=stock.symbol).first() == None:
 		db.session.add(Stock(stock.symbol, stock.name, stock.exchange, stock.price, \
 			stock.div, stock.ex_div, stock.div_pay, stock.market_cap, stock.view_count))
