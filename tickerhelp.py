@@ -22,7 +22,7 @@ for t in tickers:
 		tickerlist.append(t)
 
 
-for t in tickerlist[2500:2540]:
+for t in tickerlist:
 	try:
 		# t = clean_stock_search(t)
 		t = Share(t)
