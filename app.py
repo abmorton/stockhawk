@@ -13,7 +13,7 @@ import config
 # Instatiate and configure app:
 app = Flask(__name__)
 
-app.config.from_object('config.ProdConfig')
+app.config.from_object('config.DevConfig')
 # ------------------------------------------------------------------
 # create sqlalchemy object 
 db = SQLAlchemy(app)
@@ -201,7 +201,8 @@ def stock_lookup_and_write(symbol):
 	return stock
 
 def search_company(symbol):
-	results = Stock.query.filter(Stock.name.contains(symbol)).all()
+	symbol = "%"+symbol+"%"
+	results = Stock.query.filter(Stock.name.ilike(symbol)).all()
 	return results
 
 def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
