@@ -6,7 +6,7 @@ from wtforms.validators import Length, EqualTo, Email, NumberRange, Required
 
 
 class StockSearchForm(Form):
-	stocklookup = TextField('stocklookup', [validators.Length(min=1, max=10)])
+	stocklookup = TextField('stocklookup', [validators.Length(min=1, max=18)])
 
 class LoginForm(Form):
 	username = TextField('username', [validators.Length(min=2, max=30)])
