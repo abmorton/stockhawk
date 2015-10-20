@@ -490,7 +490,7 @@ def stocks():
 				if len(company_results) == 0:
 					flash("Couldn't find symbol or company matching "+form.stocklookup.data.upper()+". Try searching for something else.")
 				else:
-					flash("Didn't find that symbol, but found some matching company names:")
+					flash("Didn't find that symbol, but found " + str(len(company_results)) +" matching company names:")
 
 				return render_template('stocks.html', stock=stock, form=form, stocks=stocks, leaders=leaders, user=user, loggedin_user=loggedin_user, results=company_results)
 			else:
