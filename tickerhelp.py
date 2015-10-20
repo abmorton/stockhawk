@@ -2,7 +2,7 @@ from app import *
 import pandas as pd
 
 
-csv_files = ['companylist.csv', 'ASXListedCompanies.csv', 'constituents.csv', 'FTSE100.csv', 'nasdaq100.csv', 'NASDAQComposite.csv', 'NYSE100.csv', 'NYSEComposite.csv', 'SP500.csv']
+csv_files = ['constituents.csv', 'FTSE100.csv', 'nasdaq100.csv', 'NASDAQComposite.csv', 'NYSE100.csv', 'NYSEComposite.csv', 'SP500.csv']
 
 for csv in csv_files:
 	print "Starting " + csv
