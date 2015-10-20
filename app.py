@@ -200,6 +200,10 @@ def stock_lookup_and_write(symbol):
 	write_stock_to_db(stock)
 	return stock
 
+def search_company(symbol):
+	results = Stock.query.filter(Stock.name.contains(symbol)).all()
+	return results
+
 def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 	stock = set_stock_data(stock)
 	write_stock_to_db(stock) # NOW?
@@ -481,10 +485,17 @@ def stocks():
 		if form.validate():
 			stock = Share(clean_stock_search(form.stocklookup.data))
 			if stock.get_price() == None:
-				flash("Couldn't find stock matching '"+form.stocklookup.data.upper()+"'. Try another symbol.")
+			# company lookup goes here
+				company_results = search_company(form.stocklookup.data)
 				stock = None
-				return redirect(url_for('stocks'))
+				if len(company_results) == 0:
+					flash("Couldn't find symbol or company matching "+form.stocklookup.data.upper()+". Try searching for something else.")
+				else:
+					flash("Didn't find that symbol, but found some matching company names:")
+
+				return render_template('stocks.html', stock=stock, form=form, stocks=stocks, leaders=leaders, user=user, loggedin_user=loggedin_user, results=company_results)
 			else:
+				# There is a stock with this symbol, serve the dynamic page
 				stock = set_stock_data(stock)
 				# Some stocks appear to not have company names
 				if stock.name != None:
@@ -504,9 +515,10 @@ def stocks():
 
 @app.route('/stocks/<symbol>', methods=['GET', 'POST'])
 def stock(symbol):
+	# symbol = symbol.upper()
 	stock = Share(symbol)
 	if stock.get_price() == None:
-		flash("Couldn't find stock matching '"+form.stocklookup.data.upper()+"'. Try another symbol.")
+		flash("Couldn't find stock matching '"+form.stocklookup.data+"'. Try another symbol.")
 		stock = None
 		return redirect(url_for('stocks'))
 	else:

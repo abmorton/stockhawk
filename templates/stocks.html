@@ -81,6 +81,15 @@
 	{% endif %}
 
 	{% if not stock %}
+	<!-- <h4>Couldn't find a stock with that symbol. Did you mean one of these?</h4> -->
+	<table>
+	{% for result in results %}
+		<tr>
+		<td><a href="{{ url_for('stock', symbol=result.symbol) }}">{{ result.symbol }}</td><td>{{ result.name }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	<br>
 		<h4>Most popular stock searches:</h4>
 	<div class="stocklist">
 		<table class="stocklist">

@@ -89,8 +89,7 @@
 			{{ tradeform.buy_or_sell }}
 			<input type="submit" value="Trade"></p>
 		</form>
-	 </div>
-		
+	 </div>	
 		{% if position %}
 		<div class="stockposition">
 			<table>
@@ -109,7 +108,8 @@
 		<div class="stockposition">
 			<table>
 				<tr>
-					<td>You have no shares of {{ stock.name }}.</td>
+					<td>Shares of {{ stock.name }} owned:</td>
+					<td>0</td>
 				</tr>
 				<tr>
 					<td>Available cash: </td>
