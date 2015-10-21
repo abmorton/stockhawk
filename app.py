@@ -427,7 +427,7 @@ def logout():
 
 @app.route('/db_view')
 @login_reminder
-@cache.cached(timeout=60)
+# @cache.cached(timeout=30)
 def db_view():
 	title = "Under the hood"
 	user = get_user()
@@ -460,7 +460,7 @@ def leaderboard():
 	return render_template('leaderboard.html', title=title, leaders=allplayers, loggedin_user=loggedin_user)
 
 @app.route('/user', methods=['GET', 'POST'])
-@cache.cached(timeout=60)
+# @cache.cached(timeout=20)
 @login_required
 def user():
 	title = session['username']+"'s account summary"
