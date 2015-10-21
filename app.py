@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash, Markup
 from functools import wraps
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.cache import Cache
 from sqlalchemy import desc
 from yahoo_finance import Share
 from forms import StockSearchForm, LoginForm, RegisterForm, TradeForm, FullTradeForm
@@ -10,14 +11,15 @@ import config
 # from helpers import set_color, clean_stock_search, set_stock_data, convert_yhoo_date, write_stock_to_db
 
 # --------------------------------------------------------------------
-# Instatiate and configure app:
+# Instatiate and configure app, db, cache, etc.:
 app = Flask(__name__)
 
-app.config.from_object('config.ProdConfig')
-# ------------------------------------------------------------------
-# create sqlalchemy object 
-db = SQLAlchemy(app)
+# app.config.from_object('config.DevConfig')
+app.config.from_object(os.environ['APP_SETTINGS'])
 
+cache = Cache(app)
+ 
+db = SQLAlchemy(app)
 # Import db models to be used, AFTER creating db or it fails!
 from models import *
 # ------------------------------------------------------------------
@@ -309,6 +311,24 @@ def login_reminder(f):
 			return f(*args, **kwargs)	
 	return wrap
 
+
+# Started, but not finished this decorator. I need to think about if it makes sense to implement this. There might be use cases for a similar decorator to limit trading times/days, but again, that might not serve a purpose.
+
+# def after_hours_mode(f):
+# 	@wraps(f)
+# 	def wrap(*args, **kwargs):
+# 		now = datetime.datetime.utcnow()
+# 		if now.weekday() >= 5:
+# 			#don't allow queries UNLESS the stock is NOT in db
+# 			pass
+# 		else:
+# 			return f(*args, **kwargs)
+# 	return wrap
+
+
+# It might be worth writing a caching decorator for some pages, like the db_view page or user page after hours.
+
+
 # -------------------------------------------------------
 
 # views
@@ -407,6 +427,7 @@ def logout():
 
 @app.route('/db_view')
 @login_reminder
+@cache.cached(timeout=60)
 def db_view():
 	title = "Under the hood"
 	user = get_user()
@@ -439,6 +460,7 @@ def leaderboard():
 	return render_template('leaderboard.html', title=title, leaders=allplayers, loggedin_user=loggedin_user)
 
 @app.route('/user', methods=['GET', 'POST'])
+@cache.cached(timeout=60)
 @login_required
 def user():
 	title = session['username']+"'s account summary"

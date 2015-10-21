@@ -1,4 +1,7 @@
+blinker==1.4
 Flask==0.10.1
+Flask-Cache==0.13.1
+Flask-Mail==0.9.1
 Flask-SQLAlchemy==2.0
 Flask-WTF==0.12
 gunicorn==19.3.0
