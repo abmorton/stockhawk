@@ -460,7 +460,8 @@ def leaderboard():
 	return render_template('leaderboard.html', title=title, leaders=allplayers, loggedin_user=loggedin_user)
 
 @app.route('/user', methods=['GET', 'POST'])
-@cache.cached(timeout=20)
+# @cache.cached(timeout=35)
+# unless I figure out a better way, I can't cache user pages. Two concurrent users are able to see the other's page if it's in cache!
 @login_required
 def user():
 	title = session['username']+"'s account summary"
