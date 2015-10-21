@@ -427,7 +427,9 @@ def logout():
 
 @app.route('/db_view')
 @login_reminder
-@cache.cached(timeout=40)
+# @cache.cached(timeout=40)
+# unless I figure out a better way, I can't cache user pages. Two concurrent users are able to see the other's page if it's in cache!
+
 def db_view():
 	title = "Under the hood"
 	user = get_user()
