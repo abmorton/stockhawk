@@ -314,10 +314,10 @@ def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 		else:
 			flash("You don't have any shares of " + stock.symbol + " to sell.")
 
-# def new_user_email(user):
-# 	msg = Message('Welcome to StockHawk, {}!'.format(user.name), sender=('Adam', 'abmorton@gmail.com'), recipients=[user.email])
-# 	msg.html = "<h3>Hi %s,</h3><p>Thanks for registering an account with StockHawk. We've added $1,000,000 of play money to your account. <a href='http://stockhawk.herokuapp.com/login'>Sign in</a> and start trading!<br><br>Good luck!<br> - Adam</p>" % user.name
-# 	mail.send(msg)
+def new_user_email(user):
+	msg = Message('Welcome to StockHawk, {}!'.format(user.name), sender=('Adam', 'abmorton@gmail.com'), recipients=[user.email])
+	msg.html = "<h3>Hi %s,</h3><p>Thanks for registering an account with StockHawk. We've added $1,000,000 of play money to your account. <a href='http://stockhawk.herokuapp.com/login'>Sign in</a> and start trading!<br><br>Good luck!<br> - Adam</p>" % user.name
+	mail.send(msg)
 
 def reset_password_email(user):
 	pass
@@ -412,7 +412,7 @@ def register():
 				session['username'] = user.name
 				flash('Thanks for registering!')
 				flash('$1,000,000.00 was added to your account.')
-				# new_user_email(user)
+				new_user_email(user)
 				return redirect(url_for('user'))
 			else:
 				flash('That email is already registered with a user. Please log in or register another user.')
