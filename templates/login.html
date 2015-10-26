@@ -5,7 +5,7 @@
 <form action="{{ url_for('login') }}" method="post">
 	{{ form.hidden_tag() }}
 
-	<p>Username:
+	<p>Username or email:
 		{{ form.username(autofocus="autofocus", placeholder="user@email.com") }}
 		Password:
 		{{ form.password }}

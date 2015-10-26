@@ -427,7 +427,6 @@ def login():
 				# experiment
 				session['username'] = request.form['username'] 
 				flash('You were just logged in.')			
-				user = User.query.filter_by(name=user.name).first()
 				user.last_seen = datetime.datetime.now()
 				db.session.commit()
 				return redirect(url_for('user'))
@@ -435,8 +434,21 @@ def login():
 				flash('Incorrect password for that user name, please try again.')
 				return redirect(url_for('login'))
 		else:
-			flash('That user name does not exist in our system. Please try again or sign up for a new account.')
-			return redirect(url_for('login'))
+			# Allowing the user to sign in using email.
+			user = User.query.filter_by(email=form.username.data).first()
+			if user != None:
+
+				userpw = user.password
+				if userpw == form.password.data:
+					session['logged_in'] = True
+					session['username'] = user.name
+					flash('You were just logged in.')			
+					user.last_seen = datetime.datetime.now()
+					db.session.commit()
+					return redirect(url_for('user'))
+			else:
+				flash('That user name does not exist in our system. Please try again or sign up for a new account.')
+				return redirect(url_for('login'))
 		return render_template('login.html', form=form, error=error, title=title)
 	elif request.method == 'POST' and not form.validate():
 		flash('Invalid username or password. Try again, or register a new account')
