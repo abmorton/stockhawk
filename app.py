@@ -606,12 +606,14 @@ def stock(symbol):
 		portfolio = user.portfolio
 		portfolio.prettycash = pretty_numbers(portfolio.cash)
 		# This is to show many shares much of that particular stock a user has in his/her position.
+		positions = portfolio.positions
 		position = portfolio.positions.filter_by(symbol=symbol).first()
 		if position:
 			position.prettysharecount = pretty_ints(position.sharecount)
 	else:
 		portfolio = None
 		position = None
+		positions = None
 
 	if request.method == 'POST' and tradeform.validate():
 		share_amount = tradeform.amount.data
