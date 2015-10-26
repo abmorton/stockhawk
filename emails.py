@@ -1,6 +1,6 @@
 from app import async, app, config, Message, mail
 
-
+# emails
 @async
 def send_async_email(app, msg):
 	with app.app_context():

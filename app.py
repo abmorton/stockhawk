@@ -8,12 +8,11 @@ from yahoo_finance import Share
 from forms import StockSearchForm, LoginForm, RegisterForm, PasswordReminderForm, TradeForm, FullTradeForm
 from threading import Thread
 from emails import *
-# from decorators import *
 import datetime
 import os
 import config
 
-# from helpers import get_datetime_today, pretty_numbers, pretty_ints, pretty_percent, pretty_leaders, get_leaderboard, get_user, get_account_details, clean_stock_search, get_Share, set_stock_data, write_stock_to_db, stock_lookup_and_write, search_company, convert_yhoo_date, trade, login_required, login_reminder
+# from helpers import get_datetime_today, pretty_numbers, pretty_ints, pretty_percent, pretty_leaders, get_leaderboard, get_user, get_account_details, clean_stock_search, get_Share, set_stock_data, write_stock_to_db, stock_lookup_and_write, search_company, convert_yhoo_date, trade
 
 # --------------------------------------------------------------------
 # Instatiate and configure app, db, cache, mail, etc.:
