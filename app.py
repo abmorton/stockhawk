@@ -215,7 +215,9 @@ def stock_lookup_and_write(symbol):
 # I don't think I've implemented this everywhere yet, need to review.
 def search_company(symbol):
 	symbol = "%"+symbol+"%"
-	results = Stock.query.filter(Stock.name.ilike(symbol)).first()
+	# results = Stock.query.filter(Stock.name.ilike(symbol)).first()
+	results = Stock.query.filter(Stock.name.ilike(symbol)).all()
+
 	return results
 
 # Yahoo dates are strings that look like "8/12/2015"; we need to
@@ -584,7 +586,7 @@ def stocks():
 def stock(symbol):
 	stock = get_Share(symbol)
 	if stock.data_set['Open'] == None:
-		flash("Couldn't find stock matching '"+form.stocklookup.data+"'. Try another symbol.")
+		flash("Couldn't find that stock. Try another symbol.")
 		stock = None
 		return redirect(url_for('stocks'))
 	else:
