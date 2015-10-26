@@ -6,8 +6,7 @@ from sqlalchemy import desc
 from yahoo_finance import Share
 from forms import StockSearchForm, LoginForm, RegisterForm, PasswordReminderForm, TradeForm, FullTradeForm
 from threading import Thread
-from decorators import *
-from emails import *
+
 import datetime
 import os
 import config
@@ -27,7 +26,12 @@ mail = Mail(app)
  
 db = SQLAlchemy(app)
 # Import db models to be used, AFTER creating db or it fails!
+
 from models import *
+
+# These use 'app', so need to be imported after 'app' instance is created.
+from decorators import *
+from emails import *
 
 # ------------------------------------------------------------------
 # helper functions to clean up app.py / view file
