@@ -5,7 +5,6 @@ class BaseConfig(object):
 	WTF_CSRF_ENABLED = True
 	SECRET_KEY = 'Hvee923sdf@#234argag~``gdgsa;5a202[a1d'
 	CACHE_TYPE = 'simple'
-	# Flask-Mail config:
 	# MAIL_USE_SSL = True
 	MAIL_PORT = 587
 	MAIL_USE_TLS = True
