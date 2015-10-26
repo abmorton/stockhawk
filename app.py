@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, session, f
 from functools import wraps
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.cache import Cache
+from flask.ext.mail import Mail, Message
 from sqlalchemy import desc
 from yahoo_finance import Share
 from forms import StockSearchForm, LoginForm, RegisterForm, TradeForm, FullTradeForm
@@ -11,17 +12,21 @@ import config
 # from helpers import set_color, clean_stock_search, set_stock_data, convert_yhoo_date, write_stock_to_db
 
 # --------------------------------------------------------------------
-# Instatiate and configure app, db, cache, etc.:
+# Instatiate and configure app, db, cache, mail, etc.:
 app = Flask(__name__)
 
 # app.config.from_object('config.DevConfig')
 app.config.from_object(os.environ['APP_SETTINGS'])
 
 cache = Cache(app)
+
+mail = Mail(app)
  
 db = SQLAlchemy(app)
 # Import db models to be used, AFTER creating db or it fails!
 from models import *
+
+
 # ------------------------------------------------------------------
 # helper functions to clean up app.py / view file
 
@@ -29,15 +34,6 @@ def get_datetime_today():
 	now = datetime.datetime.now()
 	today = datetime.date(now.year, now.month, now.day)
 	return today
-
-def get_user():
-	if 'username' in session:
-		loggedin_user = session['username']
-		user = session['username']
-	else:
-		loggedin_user = None
-		user = None
-	return user
 
 # Converts numbers to $---,---,---.-- format and returns as string.
 def pretty_numbers(value):
@@ -80,19 +76,14 @@ def get_leaderboard(user):
 		user = None
 	return user, allplayers, leaders
 
-
-# If there's no connectivity to yahoo-finance api, bypass and query db instead, but also indicate this to user
-# def db_if_yahoo_fail(f):
-# 	@wraps(f)
-# 	def wrap(*args, **kwargs):
-# 		try:
-# 			f(*args, **kwargs)
-# 			return flash('hi')
-# 		except:
-# 			flash("Couldn't connect to yahoo-finance API, getting quotes from database.")
-# 			# return search_company(*args)
-# 			return redirect(url_for('news'))
-# 	return wrap
+def get_user():
+	if 'username' in session:
+		loggedin_user = session['username']
+		user = session['username']
+	else:
+		loggedin_user = None
+		user = None
+	return user
 
 # bypass? or cache?
 def get_account_details(portfolio, positions):
@@ -122,9 +113,13 @@ def get_account_details(portfolio, positions):
 	portfolio.prettytotal_stock_value = pretty_numbers(portfolio.total_stock_value)
 	portfolio.total_gain_loss = total_gain_loss
 	portfolio.prettytotal_gain_loss = pretty_numbers(portfolio.total_gain_loss)
-	portfolio.total_gain_loss_percent = portfolio.total_gain_loss/portfolio.total_cost*100
-	portfolio.prettytotal_gain_loss_percent = pretty_percent(portfolio.total_gain_loss_percent)
-	if portfolio.total_gain_loss <= 0.000:
+	if portfolio.total_cost != 0.00:
+		portfolio.total_gain_loss_percent = portfolio.total_gain_loss/portfolio.total_cost*100
+		portfolio.prettytotal_gain_loss_percent = pretty_percent(portfolio.total_gain_loss_percent)
+	else:
+		portfolio.total_gain_loss_percent = 0
+		portfolio.prettytotal_gain_loss_percent = "0%"
+	if portfolio.total_gain_loss < 0.00:
 		portfolio.loss = True
 
 	db.session.commit() # not necessary?
@@ -221,11 +216,9 @@ def search_company(symbol):
 	return results
 
 # Yahoo dates are strings that look like "8/12/2015"; we need to
-# convert this into a python datetime format for the db. However, 
-# we will still display the yahoo dates back to the user.
+# convert this into a python datetime format for the db. 
 def convert_yhoo_date(yhoo_date):
-	# argument yhoo_date should be stock.ev_div or stock.div_pay,
-	# which are strings that look like "8/6/2015. They can also be None."
+	# argument yhoo_date should look like "8/6/2015" or None.
 	if yhoo_date != None:
 		# split and unpack month, day, year variables
 		month, day, year = yhoo_date.split('/')
@@ -306,7 +299,6 @@ def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 				position.cost = float(position.cost) + total_cost
 				position.value = float(position.value) + total_cost
 				position.sharecount = position.sharecount + share_amount*bs_mult
-
 				# I'll remove this one if I can figure out the bug with Heroku's db.
 				db.session.commit()
 				# close position if no more shares
@@ -322,7 +314,14 @@ def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 		else:
 			flash("You don't have any shares of " + stock.symbol + " to sell.")
 
-# login required decorator
+def new_user_email(user):
+	msg = Message('Welcome to StockHawk, {}!'.format(user.name), sender=('Adam', 'abmorton@gmail.com'), recipients=[user.email])
+	msg.html = "<h3>Hi %s,</h3><p>Thanks for registering an account with StockHawk. We've added $1,000,000 of play money to your account. <a href='http://stockhawk.herokuapp.com/login'>Sign in</a> and start trading!<br><br>Good luck!<br> - Adam</p>" % user.name
+	mail.send(msg)
+
+def reset_password_email(user):
+	pass
+
 def login_required(f):
 	@wraps(f)
 	def wrap(*args, **kwargs):
@@ -344,7 +343,6 @@ def login_reminder(f):
 			return f(*args, **kwargs)	
 	return wrap
 
-
 # Started, but not finished this decorator. I need to think about if it makes sense to implement this. There might be use cases for a similar decorator to limit trading times/days, but again, that might not serve a purpose.
 
 # def after_hours_mode(f):
@@ -356,6 +354,20 @@ def login_reminder(f):
 # 			pass
 # 		else:
 # 			return f(*args, **kwargs)
+# 	return wrap
+
+
+# If there's no connectivity to yahoo-finance api, bypass and query db instead, but also indicate this to user
+# def db_if_yahoo_fail(f):
+# 	@wraps(f)
+# 	def wrap(*args, **kwargs):
+# 		try:
+# 			f(*args, **kwargs)
+# 			return flash('hi')
+# 		except:
+# 			flash("Couldn't connect to yahoo-finance API, getting quotes from database.")
+# 			# return search_company(*args)
+# 			return redirect(url_for('news'))
 # 	return wrap
 
 # -------------------------------------------------------
@@ -400,6 +412,7 @@ def register():
 				session['username'] = user.name
 				flash('Thanks for registering!')
 				flash('$1,000,000.00 was added to your account.')
+				new_user_email(user)
 				return redirect(url_for('user'))
 			else:
 				flash('That email is already registered with a user. Please log in or register another user.')
@@ -504,7 +517,7 @@ def leaderboard():
 
 @app.route('/user', methods=['GET', 'POST'])
 # @cache.cached(timeout=35)
-# unless I figure out a better way, I can't cache user pages. Two concurrent users are able to see the other's page if it's in cache!
+# unless I figure out a better way, I can't cache user pages. Two concurrent users are able to see the other's page if it's in cache! memoize might work, though...
 @login_required
 def user():
 	title = session['username']+"'s account summary"
