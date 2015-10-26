@@ -19,8 +19,6 @@ class DevConfig(BaseConfig):
 	DEBUG = True
 	SQLALCHEMY_DATABASE_URI = 'sqlite:///flaskpractice.db'
 	# MAIL_SERVER = 'smtp.gmail.com'
-
-	# MAIL_SERVER = 
 	# MAIL_USERNAME = 
 	# MAIL_PASSWORD = 
 
