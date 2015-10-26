@@ -18,11 +18,18 @@
 	{% for position in positions %}
 	<tr class="stocklist">
 		<td><a href="{{ url_for('stock', symbol=position.symbol) }}">{{ position.symbol }}</a></td>
-		<td>{{ position.sharecount }}</td>
+		<td>{{ position.prettysharecount }}</td>
 		<td>{{ position.prettyvalue }}</td>
 		<td>{{ position.prettycost }}</td>
-		<td>{{ position.prettygain_loss }}</td>
-		<td>{{ position.prettygain_loss_percent }}</td>
+	{% if position.loss %}
+		<td class="loss">{{ position.prettygain_loss }}</td>
+		<td class="loss">{{ position.prettygain_loss_percent }}</td>
+	{% endif %}
+	{% if not position.loss %}
+		<td class="gain">{{ position.prettygain_loss }}</td>
+		<td class="gain">{{ position.prettygain_loss_percent }}</td>
+	{% endif %}
+
 		<td></td>
 	</tr>
 	{% endfor %}
@@ -31,8 +38,14 @@
 		<td></td>
 		<td>{{ portfolio.prettytotal_stock_value }}</td>
 		<td>{{ portfolio.prettytotal_cost }}</td>
-		<td>{{ portfolio.prettytotal_gain_loss }}</td>
-		<td></td>
+		{% if portfolio.loss %}
+			<td class="loss">{{ portfolio.prettytotal_gain_loss }}</td>
+			<td class="loss">{{ portfolio.prettytotal_gain_loss_percent }}</td>
+		{% endif %}
+		{% if not portfolio.loss %}
+			<td class="gain">{{ portfolio.prettytotal_gain_loss }}</td>
+			<td class="gain">{{ portfolio.prettytotal_gain_loss_percent }}</td>
+		{% endif %}
 		<td></td>
 	</tr>
 	<tr>

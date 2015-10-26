@@ -19,7 +19,7 @@
 			<span id="exchange"> - {{ stock.exchange }}</span><br>
 			<span id="price" >{{ stock.prettyprice }}</span>
 			{% if stock.loss %}
-			<span class="loss">{{ stock.change }} ({{ stock.percent_change }})</span><br>
+			<span class="loss-summary">{{ stock.change }} ({{ stock.percent_change }})</span><br>
 			{% endif %}
 			{% if not stock.loss %}
 			<span id="change">{{ stock.change }} ({{ stock.percent_change }})</span><br>	
@@ -94,11 +94,11 @@
 			<table>
 				<tr>
 					<td>Shares of {{ position.symbol }} owned: </td>
-					<td>{{ position.sharecount }}</td>
+					<td>{{ position.prettysharecount }}</td>
 				</tr>
 				<tr>
 					<td>Available cash: </td>
-					<td>{{ user.portfolio.cash }}</td>
+					<td>{{ user.portfolio.prettycash }}</td>
 				</tr>
 			</table>
 		</div>
@@ -107,12 +107,12 @@
 		<div class="stockposition">
 			<table>
 				<tr>
-					<td>Shares of {{ stock.name }} owned:</td>
+					<td>Shares of {{ stock.symbol }} owned:</td>
 					<td>0</td>
 				</tr>
 				<tr>
 					<td>Available cash: </td>
-					<td>{{ user.portfolio.cash }}</td>
+					<td>{{ user.portfolio.prettycash }}</td>
 				</tr>
 			</table>
 		</div>

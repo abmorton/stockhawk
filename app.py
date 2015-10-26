@@ -39,6 +39,30 @@ def get_user():
 		user = None
 	return user
 
+# Converts numbers to $---,---,---.-- format and returns as string.
+def pretty_numbers(value):
+	return '${:,.2f}'.format(value)
+
+def pretty_ints(value):
+	return '{:,}'.format(value)
+
+def pretty_percent(value):
+	return '{:,.2f}%'.format(value)
+
+def pretty_leaders(leaders):
+	for l in leaders:
+		l.prettyvalue = pretty_numbers(l.value)
+	return leaders
+
+# Determines the color for gains/loses by passing a boolean value
+# to the html template
+def set_color(change):
+	if float(change) < 0.000000:
+		return True
+	else:
+		return False
+
+# cache
 def get_leaderboard(user):
 	allplayers = Portfolio.query.order_by(desc(Portfolio.value)).all()
 	leaders = Portfolio.query.order_by(desc(Portfolio.value)).limit(5).all()
@@ -57,6 +81,20 @@ def get_leaderboard(user):
 	return user, allplayers, leaders
 
 
+# If there's no connectivity to yahoo-finance api, bypass and query db instead, but also indicate this to user
+# def db_if_yahoo_fail(f):
+# 	@wraps(f)
+# 	def wrap(*args, **kwargs):
+# 		try:
+# 			f(*args, **kwargs)
+# 			return flash('hi')
+# 		except:
+# 			flash("Couldn't connect to yahoo-finance API, getting quotes from database.")
+# 			# return search_company(*args)
+# 			return redirect(url_for('news'))
+# 	return wrap
+
+# bypass? or cache?
 def get_account_details(portfolio, positions):
 	value = portfolio.cash
 	total_gain_loss = float(0.00)
@@ -69,6 +107,8 @@ def get_account_details(portfolio, positions):
 		value += p.value
 		p.gain_loss = p.value - p.cost
 		p.gain_loss_percent = p.gain_loss/p.cost*100
+		if p.gain_loss <= 0.0000:
+			p.loss = True
 		p.prettygain_loss = pretty_numbers(p.gain_loss)
 		total_gain_loss = float(p.gain_loss) + total_gain_loss
 		total_cost = float(p.cost) + total_cost
@@ -82,29 +122,13 @@ def get_account_details(portfolio, positions):
 	portfolio.prettytotal_stock_value = pretty_numbers(portfolio.total_stock_value)
 	portfolio.total_gain_loss = total_gain_loss
 	portfolio.prettytotal_gain_loss = pretty_numbers(portfolio.total_gain_loss)
+	portfolio.total_gain_loss_percent = portfolio.total_gain_loss/portfolio.total_cost*100
+	portfolio.prettytotal_gain_loss_percent = pretty_percent(portfolio.total_gain_loss_percent)
+	if portfolio.total_gain_loss <= 0.000:
+		portfolio.loss = True
 
 	db.session.commit() # not necessary?
 	return portfolio, positions
-
-# Converts numbers to $---,---,---.-- format and returns as string.
-def pretty_numbers(value):
-	return '${:,.2f}'.format(value)
-
-def pretty_percent(value):
-	return '{:,.2f}%'.format(value)
-
-def pretty_leaders(leaders):
-	for l in leaders:
-		l.prettyvalue = pretty_numbers(l.value)
-	return leaders
-
-# Determines the color for gains/loses by passing a boolean value
-# to the html template
-def set_color(change):
-	if float(change) < 0.000000:
-		return True
-	else:
-		return False
 
 # This is to take out punctuation and white spaces from the stock search string.
 def clean_stock_search(symbol):
@@ -116,6 +140,12 @@ def clean_stock_search(symbol):
 	if len(no_punct) == 0:
 		no_punct = 'RETRY'
 	return no_punct
+
+# bypass?
+# @db_if_yahoo_fail
+def get_Share(symbol):
+	stock = Share(clean_stock_search(symbol))
+	return stock
 
 # Puts various attributes into 'stock' via different Share methods.
 def set_stock_data(stock):
@@ -158,24 +188,6 @@ def set_stock_data(stock):
 	stock.loss = set_color(stock.change)
 	return stock
 
-# Yahoo dates are strings that look like "8/12/2015"; we need to
-# convert this into a python datetime format for the db. However, 
-# we will still display the yahoo dates back to the user.
-def convert_yhoo_date(yhoo_date):
-	# argument yhoo_date should be stock.ev_div or stock.div_pay,
-	# which are strings that look like "8/6/2015. They can also be None."
-	if yhoo_date != None:
-		# split and unpack month, day, year variables
-		month, day, year = yhoo_date.split('/')
-		# convert from strings to integers, for datetime.date function below
-		month = int(month)
-		day = int(day)
-		year = int(year)
-		# create datetime object 
-		return datetime.date(year, month, day)
-	else:
-		return None
-
 def write_stock_to_db(stock):
 	# Here, the input 'stock' argument is a stock object
 	# which has been passed through the set_stock_data function.
@@ -200,10 +212,29 @@ def stock_lookup_and_write(symbol):
 	write_stock_to_db(stock)
 	return stock
 
+# I don't think I've implemented this everywhere yet, need to review.
 def search_company(symbol):
 	symbol = "%"+symbol+"%"
-	results = Stock.query.filter(Stock.name.ilike(symbol)).all()
+	results = Stock.query.filter(Stock.name.ilike(symbol)).first()
 	return results
+
+# Yahoo dates are strings that look like "8/12/2015"; we need to
+# convert this into a python datetime format for the db. However, 
+# we will still display the yahoo dates back to the user.
+def convert_yhoo_date(yhoo_date):
+	# argument yhoo_date should be stock.ev_div or stock.div_pay,
+	# which are strings that look like "8/6/2015. They can also be None."
+	if yhoo_date != None:
+		# split and unpack month, day, year variables
+		month, day, year = yhoo_date.split('/')
+		# convert from strings to integers, for datetime.date function below
+		month = int(month)
+		day = int(day)
+		year = int(year)
+		# create datetime object 
+		return datetime.date(year, month, day)
+	else:
+		return None
 
 def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 	stock = set_stock_data(stock)
@@ -324,10 +355,6 @@ def login_reminder(f):
 # 		else:
 # 			return f(*args, **kwargs)
 # 	return wrap
-
-
-# It might be worth writing a caching decorator for some pages, like the db_view page or user page after hours.
-
 
 # -------------------------------------------------------
 
@@ -467,20 +494,23 @@ def leaderboard():
 @login_required
 def user():
 	title = session['username']+"'s account summary"
+	today = get_datetime_today()
 	form = FullTradeForm(request.form)
 	loggedin_user = session['username']
 	# loggedin_user = get_user()   <-- better 
 	user = User.query.filter_by(name=session['username']).first()
 	portfolio = user.portfolio
 	positions = portfolio.positions.all()
-	today = get_datetime_today()
+	for p in positions:
+		p.prettysharecount = pretty_ints(p.sharecount)
 
 	if request.method == 'GET':
 		# refresh current stock prices and therefore account value
 		portfolio, positions = get_account_details(portfolio, positions)
 		return render_template('account.html', title=title, user=user, portfolio=portfolio, form=form, loggedin_user=loggedin_user, positions=positions)
 	elif request.method == 'POST' and form.validate():
-		stock = Share(clean_stock_search(form.symbol.data))
+		stock = get_Share(form.symbol.data)
+		# stock = Share(clean_stock_search(form.symbol.data))
 		share_amount = form.share_amount.data
 		buy_or_sell = form.buy_or_sell.data
 		if stock.get_price() == None:
@@ -507,8 +537,9 @@ def stocks():
 	stocks = Stock.query.order_by(desc(Stock.view_count)).limit(10).all()
 	if request.method == 'POST':
 		if form.validate():
-			stock = Share(clean_stock_search(form.stocklookup.data))
-			if stock.get_price() == None:
+			stock = get_Share(form.stocklookup.data)
+			# stock = Share(clean_stock_search(form.stocklookup.data))
+			if stock.data_set['Open'] == None:
 			# company lookup goes here
 				company_results = search_company(form.stocklookup.data)
 				stock = None
@@ -539,32 +570,34 @@ def stocks():
 
 @app.route('/stocks/<symbol>', methods=['GET', 'POST'])
 def stock(symbol):
-	# symbol = symbol.upper()
-	stock = Share(symbol)
-	if stock.get_price() == None:
+	stock = get_Share(symbol)
+	if stock.data_set['Open'] == None:
 		flash("Couldn't find stock matching '"+form.stocklookup.data+"'. Try another symbol.")
 		stock = None
 		return redirect(url_for('stocks'))
 	else:
+		# you wrote a function for these two lines, replace here!
 		stock = set_stock_data(Share(symbol))
 		write_stock_to_db(stock)
+		### ^^
 	title = stock.name
 	loggedin_user = get_user()
 	user, allplayers, leaders = get_leaderboard(loggedin_user)
-
-	if user != None:
-		portfolio = user.portfolio
-		positions = portfolio.positions.all()
-		# This is to show many shares much of that particular stock a user has in his/her position.
-		position = portfolio.positions.filter_by(symbol=symbol).first()
-	else:
-		portfolio = None
-		positions = None
-		position = None
-
+	
 	form = StockSearchForm(request.form)
 	tradeform = TradeForm(request.form)	
 	stocks = Stock.query.order_by(desc(Stock.view_count)).limit(10).all()
+
+	if user != None:
+		portfolio = user.portfolio
+		portfolio.prettycash = pretty_numbers(portfolio.cash)
+		# This is to show many shares much of that particular stock a user has in his/her position.
+		position = portfolio.positions.filter_by(symbol=symbol).first()
+		if position:
+			position.prettysharecount = pretty_ints(position.sharecount)
+	else:
+		portfolio = None
+		position = None
 
 	if request.method == 'POST' and tradeform.validate():
 		share_amount = tradeform.amount.data
@@ -594,16 +627,6 @@ def stock(symbol):
 # 		loggedin_user = None
 
 # 	return render_template('welcome.html', title=title, loggedin_user=loggedin_user)
-
-
-# @app.route('/trade', methods=['GET', 'POST'])
-# @login_required
-# def trade():
-# 	tradeform = TradeForm(request.form)
-
-# 	flash('I have not yet set up trading via the stock page. Try it from the user page.')
-# 	return redirect(url_for('user'))
-
 
 if __name__ == '__main__':
 	app.run()
