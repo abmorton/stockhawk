@@ -1,5 +1,6 @@
 from functools import wraps
 from threading import Thread
+from app import render_template, redirect, url_for, request, session, flash, Markup
 
 # decorators
 

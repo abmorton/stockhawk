@@ -5,8 +5,6 @@ from flask.ext.mail import Mail, Message
 from sqlalchemy import desc
 from yahoo_finance import Share
 from forms import StockSearchForm, LoginForm, RegisterForm, PasswordReminderForm, TradeForm, FullTradeForm
-from threading import Thread
-
 import datetime
 import os
 import config
@@ -28,10 +26,6 @@ db = SQLAlchemy(app)
 # Import db models to be used, AFTER creating db or it fails!
 
 from models import *
-
-# These use 'app', so need to be imported after 'app' instance is created.
-from decorators import *
-from emails import *
 
 # ------------------------------------------------------------------
 # helper functions to clean up app.py / view file
@@ -320,6 +314,12 @@ def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 		else:
 			flash("You don't have any shares of " + stock.symbol + " to sell.")
 
+# decorators ============================
+
+from decorators import *
+from emails import send_async_email, send_email, new_user_email, password_reminder_email
+# Importing email functions here since they use the above decorator.
+
 #=======================================
 # views
 
@@ -461,7 +461,6 @@ def password_reminder():
 @login_reminder
 # @cache.cached(timeout=40)
 # unless I figure out a better way, I can't cache user pages. Two concurrent users are able to see the other's page if it's in cache!
-
 def db_view():
 	title = "Under the hood"
 	user = get_user()
