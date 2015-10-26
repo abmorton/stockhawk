@@ -315,7 +315,7 @@ def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 			flash("You don't have any shares of " + stock.symbol + " to sell.")
 
 def new_user_email(user):
-	msg = Message('Welcome to StockHawk, {}!'.format(user.name), sender=('Adam', 'abmorton@gmail.com'), recipients=[user.email])
+	msg = Message('Welcome to StockHawk, {}!'.format(user.name), sender=('Adam', config.BaseConfig.MAIL_USERNAME), recipients=[user.email])
 	msg.html = "<h3>Hi %s,</h3><p>Thanks for registering an account with StockHawk. We've added $1,000,000 of play money to your account. <a href='http://stockhawk.herokuapp.com/login'>Sign in</a> and start trading!<br><br>Good luck!<br> - Adam</p>" % user.name
 	mail.send(msg)
 

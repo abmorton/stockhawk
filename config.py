@@ -2,10 +2,12 @@ import os
 
 class BaseConfig(object):
 	DEBUG = False
+	
 	WTF_CSRF_ENABLED = True
 	SECRET_KEY = os.environ['SECRET_KEY']
+	
 	CACHE_TYPE = 'simple'
-	# MAIL_USE_SSL = True
+	
 	MAIL_PORT = 587
 	MAIL_USE_TLS = True
 	MAIL_SERVER = os.environ['MAIL_SERVER']
