@@ -5,11 +5,15 @@ from flask.ext.cache import Cache
 from flask.ext.mail import Mail, Message
 from sqlalchemy import desc
 from yahoo_finance import Share
-from forms import StockSearchForm, LoginForm, RegisterForm, TradeForm, FullTradeForm
+from forms import StockSearchForm, LoginForm, RegisterForm, PasswordReminderForm, TradeForm, FullTradeForm
+from threading import Thread
+from emails import *
+# from decorators import *
 import datetime
 import os
 import config
-# from helpers import set_color, clean_stock_search, set_stock_data, convert_yhoo_date, write_stock_to_db
+
+# from helpers import get_datetime_today, pretty_numbers, pretty_ints, pretty_percent, pretty_leaders, get_leaderboard, get_user, get_account_details, clean_stock_search, get_Share, set_stock_data, write_stock_to_db, stock_lookup_and_write, search_company, convert_yhoo_date, trade, login_required, login_reminder
 
 # --------------------------------------------------------------------
 # Instatiate and configure app, db, cache, mail, etc.:
@@ -26,7 +30,6 @@ db = SQLAlchemy(app)
 # Import db models to be used, AFTER creating db or it fails!
 from models import *
 
-
 # ------------------------------------------------------------------
 # helper functions to clean up app.py / view file
 
@@ -35,7 +38,7 @@ def get_datetime_today():
 	today = datetime.date(now.year, now.month, now.day)
 	return today
 
-# Converts numbers to $---,---,---.-- format and returns as string.
+# Converts numbers to more readable financial formats
 def pretty_numbers(value):
 	return '${:,.2f}'.format(value)
 
@@ -314,13 +317,8 @@ def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 		else:
 			flash("You don't have any shares of " + stock.symbol + " to sell.")
 
-def new_user_email(user):
-	msg = Message('Welcome to StockHawk, {}!'.format(user.name), sender=('Adam', config.BaseConfig.MAIL_USERNAME), recipients=[user.email])
-	msg.html = "<h3>Hi %s,</h3><p>Thanks for registering an account with StockHawk. We've added $1,000,000 of play money to your account. <a href='http://stockhawk.herokuapp.com/login'>Sign in</a> and start trading!<br><br>Good luck!<br> - Adam</p>" % user.name
-	mail.send(msg)
-
-def reset_password_email(user):
-	pass
+#==========================================
+# decorators
 
 def login_required(f):
 	@wraps(f)
@@ -342,6 +340,13 @@ def login_reminder(f):
 			flash(message)
 			return f(*args, **kwargs)	
 	return wrap
+
+# This decorator is to perform asynchronous tasks (such as sending emails)
+def async(f):
+	def wrapper(*args, **kwargs):
+		thr = Thread(target=f, args=args, kwargs=kwargs)
+		thr.start()
+	return wrapper
 
 # Started, but not finished this decorator. I need to think about if it makes sense to implement this. There might be use cases for a similar decorator to limit trading times/days, but again, that might not serve a purpose.
 
@@ -466,7 +471,7 @@ def login():
 				return redirect(url_for('login'))
 		return render_template('login.html', form=form, error=error, title=title)
 	elif request.method == 'POST' and not form.validate():
-		flash('Invalid username or password. Try again, or register a new account')
+		flash('Invalid username or password. Try again or register a new account.')
 		return redirect(url_for('login'))
 	elif request.method == 'GET':
 		return render_template('login.html', form=form, error=error, title=title)
@@ -478,6 +483,35 @@ def logout():
 	session.pop('username', None)
 	flash('You were just logged out.')
 	return redirect(url_for('stocks'))
+
+@app.route('/password_reminder', methods=['GET', 'POST'])
+def password_reminder():
+	error = None
+	form = PasswordReminderForm(request.form)
+	title = "Forgot your password?"	
+
+	if request.method == 'POST' and form.validate():
+		user = User.query.filter_by(name=form.username.data).first()
+		if user != None:
+			password_reminder_email(user)
+			flash("Sent reminder email to "+user.name+"'s email address. Please check your inbox and sign in. Check your spam folder if you don't see our email within a couple of minutes.")
+			return redirect(url_for('login'))
+		else:
+			# Allowing the user to sign in using email.
+			user = User.query.filter_by(email=form.username.data).first()
+			if user != None:
+				password_reminder_email(user)
+				flash("Sent reminder email to "+user.email+". Please check your inbox and sign in. Check your spam folder if you don't see our email within a couple of minutes.")
+				return redirect(url_for('login'))
+			else:
+				flash("We couldn't find any user with that username or email address. Please try a different name/address or register a new account.")
+
+	elif request.method == 'POST' and not form.validate():
+		flash('Invalid username or password. Try again or register a new account.')
+		return redirect(url_for('password_reminder'))
+	
+	# elif request.method == 'GET':
+	return render_template('password_reminder.html', form=form, title=title, error=error)
 
 @app.route('/db_view')
 @login_reminder
