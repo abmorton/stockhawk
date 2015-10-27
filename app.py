@@ -5,7 +5,7 @@ from flask.ext.mail import Mail, Message
 # from celery import Celery
 from sqlalchemy import desc
 from yahoo_finance import Share
-from forms import StockSearchForm, LoginForm, RegisterForm, PasswordReminderForm, TradeForm, FullTradeForm
+from forms import StockSearchForm, LoginForm, RegisterForm, PasswordReminderForm, PasswordResetForm, DeleteAccountForm, TradeForm, FullTradeForm
 import datetime
 import os
 import config
@@ -319,7 +319,7 @@ def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 
 # === decorator and email imports ======
 from decorators import *
-from emails import send_async_email, send_email, new_user_email, password_reminder_email
+from emails import send_async_email, send_email, new_user_email, password_reminder_email, password_reset_email
 # Importing email functions here since they use the above decorator.
 
 #=== views ====================
@@ -533,8 +533,47 @@ def user():
 def settings():
 	loggedin_user = get_user()
 	user, allplayers, leaders = get_leaderboard(loggedin_user)
+	form = PasswordResetForm(request.form)
+	deleteform = DeleteAccountForm(request.form)
 	title = "{}'s account settings".format(user.name)
-	return render_template('settings.html', title=title, loggedin_user=loggedin_user, user=user)
+
+	if request.method == 'POST' and form.validate():
+		if form.old_password.data == user.password:
+			flash("Your password has been reset.")
+			user.password = form.new_password.data
+			db.session.commit()
+			password_reset_email(user)
+			return redirect(url_for('user'))
+		else:
+			flash("Your old password was incorrect. Please try again.")
+			return redirect(url_for('settings'))
+
+	elif request.method == 'POST' and not form.validate():
+		flash("Something went wrong; please try again.")
+		return redirect(url_for('settings'))
+
+	else:
+		return render_template('settings.html', title=title, loggedin_user=loggedin_user, user=user, form=form, deleteform=deleteform)
+
+@app.route('/delete_account', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+	deleteform = DeleteAccountForm(request.form)
+	loggedin_user = get_user()
+	user, allplayers, leaders = get_leaderboard(loggedin_user)
+
+	if request.method == 'POST' and deleteform.validate():
+		if deleteform.confirm.data.upper() == 'DELETE':
+			db.session.delete(user)
+			db.session.commit()
+			flash("Your account has been deleted.")
+			return redirect(url_for('logout'))
+		else:
+			flash('Type "DELETE" in the field below if you are sure you want to delete your account; this cannot be undone.')
+			return redirect(url_for('settings'))
+	elif request.method == 'POST' and not deleteform.validate():
+		flash('Type "DELETE" in the field below if you are sure you want to delete your account; this cannot be undone.')
+		return redirect(url_for('settings'))
 
 @app.route('/stocks', methods=['GET', 'POST'])
 @login_reminder

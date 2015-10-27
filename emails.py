@@ -17,7 +17,15 @@ def new_user_email(user):
 	sender=('StockHawk', config.BaseConfig.MAIL_USERNAME)
 	recipients=[user.email]
 	text_body = "Welcome to StockHawk. Log in and start trading!"
-	html_body = "<h3>Hi %s,</h3><p>Thanks for registering an account with StockHawk. We've added $1,000,000 of play money to your account. <a href='http://stockhawk.herokuapp.com/login'>Sign in</a> and start trading!<br><br>Good luck!<br> - Adam</p>" % user.name
+	html_body = "<h3>Hi %s,</h3><p>Thanks for registering an account with StockHawk. We've added $1,000,000 of play money to your account. <a href='http://stockhawk.herokuapp.com/login'>Sign in</a> and start trading!<br><br>Good luck!<br> - Adam</p>"%(user.name)
+	send_email(subject, sender, recipients, text_body, html_body)
+
+def password_reset_email(user):
+	subject = "Password reset"
+	sender=('StockHawk', config.BaseConfig.MAIL_USERNAME)
+	recipients=[user.email]
+	text_body = "Your StockHawk password has been reset."
+	html_body = "<h3>Hi %s,</h3><p>Your password has been reset.</p><br>Happy trading!<br> - Adam</p>"%(user.name)
 	send_email(subject, sender, recipients, text_body, html_body)
 
 def password_reminder_email(user):

@@ -15,6 +15,14 @@ class LoginForm(Form):
 class PasswordReminderForm(Form):
 	username = TextField('username', [validators.Length(min=2, max=30)])
 
+class PasswordResetForm(Form):
+	old_password = PasswordField('Old password', validators=[Length(min=6, max=30, message='Password must be between 6 and 30 characters.')])
+	new_password = PasswordField('New password', validators=[Length(min=6, max=30, message='Password must be between 6 and 30 characters.')])
+	confirm_new_password = PasswordField('Confirm new password', validators=[EqualTo('new_password', message='Passwords must match.')])
+
+class DeleteAccountForm(Form):
+	confirm = TextField('Type "DELETE" to delete account', validators=[Length(min=6, max=6, message='Please type "delete" to confirm; this cannot be undone!')])
+
 class RegisterForm(Form):
 	username = TextField('Username', validators=[Length(min=2, max=25, message='Username must be between 2 and 25 characters.')])
 	email =  TextField('Email address', validators=[Length(min=6, max=50), Email(message='Please enter a valid email address.')])

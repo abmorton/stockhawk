@@ -2,7 +2,28 @@
 {% block content %}
 
 <h1>{{ title }}</h1>
-<br>
-<p>There's not much going on here yet. Check out the <a href="/user">user</a> account page.</p>
+
+<p><b>Username: </b>{{ user.name }}</p>
+<p><b>Email: </b>{{ user.email }}</p>
+
+{% from "_formhelpers.html" import render_field %}
+<form action="{{ url_for('settings') }}" method="POST">
+		{{ form.hidden_tag() }}
+  <dl>
+    {{ render_field(form.old_password) }}
+    {{ render_field(form.new_password) }}
+    {{ render_field(form.confirm_new_password) }}
+  </dl>
+  <p><input type="submit" value="Change password">
+</form>
+
+<form action="{{ url_for('delete_account') }}" method="POST">
+		{{ deleteform.hidden_tag() }}
+  <dl>
+    {{ render_field(deleteform.confirm) }}
+  </dl>
+  <p><input type="submit" value="Delete account" class="danger">
+</form>
+
 
 {% endblock %}
