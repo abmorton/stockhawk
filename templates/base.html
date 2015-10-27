@@ -17,7 +17,11 @@
               </ul>
             </li>
             {% if not loggedin_user %}
-            <li><a href="/login">Sign in</a></li>
+            <li><a href="/login">Sign in</a>
+                <ul>
+                    <li><a href="/register">Register</a></li>
+                </ul>
+            </li>
             {% endif %}
             {% if loggedin_user %}
             <li><a href="/user">{{ loggedin_user }}</a>
