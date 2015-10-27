@@ -619,6 +619,7 @@ def stocks():
 		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user)
 
 @app.route('/stocks/<symbol>', methods=['GET', 'POST'])
+@login_reminder
 def stock(symbol):
 	stock = get_Share(symbol)
 	if stock.data_set['Open'] == None:
