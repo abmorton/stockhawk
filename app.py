@@ -497,12 +497,11 @@ def leaderboard():
 # unless I figure out a better way, I can't cache user pages. Two concurrent users are able to see the other's page if it's in cache! memoize might work, though...
 @login_required
 def user():
-	title = session['username']+"'s account summary"
 	today = get_datetime_today()
 	form = FullTradeForm(request.form)
-	loggedin_user = session['username']
-	# loggedin_user = get_user()   <-- better 
+	loggedin_user = get_user() 
 	user = User.query.filter_by(name=session['username']).first()
+	title = user.name+"'s account summary"
 	portfolio = user.portfolio
 	positions = portfolio.positions.all()
 	for p in positions:
@@ -528,6 +527,14 @@ def user():
 	elif request.method == 'POST' and not form.validate():
 		flash('Invalid values. Please try again.')
 		return redirect(url_for('user'))
+
+@app.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+	loggedin_user = get_user()
+	user, allplayers, leaders = get_leaderboard(loggedin_user)
+	title = "{}'s account settings".format(user.name)
+	return render_template('settings.html', title=title, loggedin_user=loggedin_user, user=user)
 
 @app.route('/stocks', methods=['GET', 'POST'])
 @login_reminder

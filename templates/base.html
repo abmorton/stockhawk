@@ -10,15 +10,23 @@
       <div id="headercontainer">
         <span id="stockhawk"><a href="/stocks">StockHawk</a></span>
           <ul>
-            <li><a href="/">About</a></li>
-            <li><a href="/news">Releases</a></li>
-            <li><a href="/db_view">Backend</a></li>
+            <li><a href="/">About</a>
+              <ul>
+                  <li><a href="/news">Releases</a></li>
+                  <li><a href="/db_view">Backend</a></li>
+              </ul>
+            </li>
             {% if not loggedin_user %}
             <li><a href="/login">Sign in</a></li>
             {% endif %}
             {% if loggedin_user %}
-            <li><a href="/user">{{ loggedin_user }}</a></li>
-            <li><a href="/logout">Log out</a></li>
+            <li><a href="/user">{{ loggedin_user }}</a>
+              <ul>
+                <li><a href="/user">Account</a></li>
+                <li><a href="/settings">Settings</a></li>
+                <li><a href="/logout">Log out</a></li>
+              </ul>
+            </li>
             {% endif %}
           </ul>
       </div>
