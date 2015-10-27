@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, session, f
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.cache import Cache
 from flask.ext.mail import Mail, Message
+from celery import Celery
 from sqlalchemy import desc
 from yahoo_finance import Share
 from forms import StockSearchForm, LoginForm, RegisterForm, PasswordReminderForm, TradeForm, FullTradeForm
@@ -12,7 +13,7 @@ import config
 # from helpers import get_datetime_today, pretty_numbers, pretty_ints, pretty_percent, pretty_leaders, get_leaderboard, get_user, get_account_details, clean_stock_search, get_Share, set_stock_data, write_stock_to_db, stock_lookup_and_write, search_company, convert_yhoo_date, trade
 
 # --------------------------------------------------------------------
-# Instatiate and configure app, db, cache, mail, etc.:
+# Instatiate and configure app, db, cache, mail, celery, etc.:
 app = Flask(__name__)
 
 # app.config.from_object('config.DevConfig')
@@ -21,10 +22,12 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 cache = Cache(app)
 
 mail = Mail(app)
+
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
  
 db = SQLAlchemy(app)
 # Import db models to be used, AFTER creating db or it fails!
-
 from models import *
 
 # ------------------------------------------------------------------
@@ -314,15 +317,12 @@ def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 		else:
 			flash("You don't have any shares of " + stock.symbol + " to sell.")
 
-# decorators ============================
-
+# === decorator and email imports ======
 from decorators import *
 from emails import send_async_email, send_email, new_user_email, password_reminder_email
 # Importing email functions here since they use the above decorator.
 
-#=======================================
-# views
-
+#=== views ====================
 @app.errorhandler(404)
 def not_found(e):
 	flash('Resource not found.')
