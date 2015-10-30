@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Adam Morton</title>
+  <!-- <link href="/normalize.css" rel="stylesheet"> -->
+  
+<!-- Fancy Google Font -->
+  <link href='https://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
+
+  <style>
+/*parallax stuff*/
+
+section.module:last-child {
+  margin-bottom: 0;
+}
+/*section.module h2 {
+  margin-bottom: 40px;
+  font-family: "Roboto Slab", serif;
+  font-size: 30px;
+}
+section.module p {
+  margin-bottom: 40px;
+  font-size: 16px;
+  font-weight: 300;
+}*/
+section.module p:last-child {
+  margin-bottom: 0;
+}
+/*section.module.content {
+  padding: 40px 0;
+}*/
+
+section.module.parallax {
+  height: 400px;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+/*section.module.parallax h1 {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 20px;
+  line-height: 400px;
+  font-weight: 200;
+  text-align: center;*/
+  /*text-transform: uppercase;
+  font-style: italic;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+*/
+section.module.parallax-1 {
+  background-image: url("http://i.imgur.com/BpEInVf.jpg");
+}
+section.module.parallax-2 {
+  background-image: url("http://i.imgur.com/670aMIi.jpg");
+}
+section.module.parallax-3 {
+  background-image: url("http://i.imgur.com/7gAz5my.jpg");
+}
+
+@media all and (min-width: 600px) {
+  section.module h2 {
+    font-size: 42px;
+  }
+/*  section.module p {
+    font-size: 20px;
+  }
+  section.module.parallax h1 {
+    font-size: 96px;
+  }
+}*/
+@media all and (min-width: 960px) {
+  section.module.parallax h1 {
+    font-size: 160px;
+  }
+}
+
+/*original stuff*/
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    header {
+      /*text-align: center;*/
+      background: url('http://i.imgur.com/VW6n7Kr.jpg');
+      background-size: cover;
+      background-position: center center;
+      color: white;
+      margin: 0;
+      text-align: center;
+      
+      /* I had experimented with having a static header/navigation bar with previous iterations.  Un-comment out the below to see the results.*/
+
+/*    position: sticky;
+      position: -webkit-sticky;
+      position: -moz-sticky;
+      top: 0;
+      z-index: 1;*/
+    }
+    header a {
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    header a:hover {
+      color: rgba(50,170,215,1);
+    }
+    header h1 {
+      font-size: 45px;
+      color: white;
+      padding: 130px 0px 70px 0px;
+      margin-top: 0px;
+      line-height: 25px;
+      letter-spacing: 10px;
+    }
+
+    header ul {
+      padding: 10px;
+      background: rgba(255,255,255,0.3);
+    }
+    header li {
+      display: inline;
+      font-size: 21px;
+      padding: 0 35px;
+    }
+
+    article {
+      max-width: 600px;
+      padding: 30px;
+      margin: 10px auto;
+      position: relative;     
+      border-radius: 15px;
+      font-size: 17px;
+      line-height: 27px;
+    }
+
+    article img {
+      max-width: 180px;
+      margin: 0 0 0 20px;
+      float: right;
+    }
+    article h2 {
+      line-height: 12px;
+      color: rgba(50,170,215,1);
+      font-size: 28px;
+    }
+
+    /*the only reason I included this h3 styling was
+    that I had an odd bug going on with the "about me" h2 
+    where it wouldn't obey the css like the other good
+    h2s would. I realize this is messy and a hack, but it's late and I want my page to look right.*/
+    
+    article h3 {
+      line-height: 12px;
+      color: rgba(50,170,215,1);
+      font-size: 28px;
+    }
+
+    article .quote {
+      float: left;
+      font-style: italic;
+      padding: 20px 60px 30px 60px;
+    }
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 36px;
+        padding: 5px;
+      }
+      li {
+        padding: 5px;
+        display: block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>ADAM MORTON</h1>
+    <ul>
+      <li><a href="#about">About me</a></li>
+      <li><a href="#tldr">TL;DR</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="#projects">Projects</a></li>
+    </ul>
+  </header>
+  <section class="module content">
+    <div class="container">
+  <article>
+    <h3><a name="about">About me</a></h3>
+    <img src="http://i.imgur.com/QiXbdaA.jpg" id="portrait">
+    <p>September 29th, 2015 was my 4-year anniversary in San Francisco.  The city has opened up aspects of my personality, sparked new interests for me such as road cycling and rekindled old ones like competitive chess. I moved here from Houston, Texas where I was born and raised.  I graduated from the University of Houston with dual bachelor degrees in Business and French.  After graduating, I taught French at a high school in South Houston for three years until deciding that teaching the same class five times a day and repeating the entire cycle year after year would eventually bore me to tears.  But what else could I do? I felt like my business degree was a valid credential, but the education hadn't provided me with hard, tangible skills.  I just knew that I didn't want to go into sales like 70% of business school graduates.  This quote from Albert Camus reflected my condition perfectly:</p>
+      <p>    
+    <span class="quote">"I may not have been sure about what really did interest me, but I was absolutely sure about what didn't."</span>
+    </p>
+    <p>In the summer after my final year of teaching, one of my closest friends at the time suggested that project management could be an inroad to tech and other industries.  Of course, every entry-level PM position I could find required more applicable experience than I had, which was none.  I scoured my grassroots network for an opportunity to prove my mettle and found a small project customizing a content management system for a local yoga studio.  Meanwhile, my friend and I worked away on a few lightweight web development projects of our own, including a  <a href="http://abmorton.appspot.com">resume site</a> and an anagram generator on Google App Engine.  I had more fun during this time than I ever had.  We spent hours discussing speculative start-up ideas and fantasizing about life amid tech entrepreneurs in San Francisco, which seemed to be the center of everything.
+    </p>
+      </article>
+  </div>
+</section>
+    <section class="module parallax parallax-1">
+    <div class="container">
+   </div>
+    </section>
+<section class="module content">
+    <div class="container">
+    <article>
+    <p>By the end of that summer, I convinced myself to sell what I couldn't fit into two suitcases and bought a one-way ticket to San Francisco.  I didn't have a job or know anyone here, but it seemed that I would be risking more by succumbing to inaction and stagnation in Houston.  I received the keys to my appartment and started my first full-time PM job four weeks after landing in SF.  My programming hobby receded into the backseat as my focus shifted into survival mode.
+    </p>
+    <p>One job led to another, which led to my current station as a program manager at Cisco Systems.  If someone would have told me four and a half years ago that I would be living in San Francisco working for as a PM for Cisco, I would have been both surprised and elated.  I'm grateful for the opportunities I've had and the wonderful people I've had the chance to work with along the way.  However, I still find myself aching for the technical skills needed to develop and bring my own ideas to fruition.  
+    </p>
+    <p>After much consideration, I've decided to take a pause from my current trajectory and invest some time into learning those skills.  To some, it might seem risky (read: foolish) to walk away from a comfortable job which pays decently and allows me to work from home 95% of the time.  My logic is that:
+    <ul>
+      <li>Money can come and go; time only goes.</li>
+      <li>I'm better off committing myself to intense study for a shorter period of time than fitting in a couple of hours here and there around a normal work schedule.</li>
+      <li>It will never be easier for me to learn new skills than it is now.</li>
+    </ul>
+    </p>
+    <p>In many ways, I'm what you would call a "late bloomer".  This doesn't bother me much, as I don't feel as old as I am.  However, I do feel too old to act slowly on things for which I feel conviction.  </p>
+  </article>
+    </div>
+</section>
+        <section class="module parallax parallax-2">
+        <div class="container">
+        </div>
+         </section>
+  <article>
+    <h2><a name="tldr">Too long; didn't read</a></h2>
+    <p>
+      <ul>
+        <li>Education in Business and French</li>
+        <li>Taught high school French for three years</li>
+        <li>Left teaching, feeling stagnated</li>
+        <li>Moved to SF, seeking change and opportunity</li>
+        <li>Worked various project management jobs for the past four years, leading to current PM role at Cisco</li>
+        <li>Desire to posess the technical skills needed to build my own ideas</li>
+        <li>Decision to realign my career path and learn to program full-time</li>
+      </ul>
+    </p>
+    <h2><a name="contact">Contact me</a></h2>
+    <p>
+      <ul>
+        <li>Resume website: <a href="http://abmorton.appspot.com">abmorton.appspot.com</a></li>
+        <li>LinkedIn: <a href="http://www.linkedin.com/in/abmorton">www.linkedin.com/in/abmorton</a></li>
+        <li>Email: <a href="mailto:abmorton@gmail.com">abmorton@gmail.com</a></li>
+        <li>Phone: (281) 300-1783</li>
+      </ul>
+    </p>
+    <h2><a name="projects">Projects</a></h2>
+    <p>Projects I'm working on to learn to program:
+    </p>
+    <p>
+      <ul>
+        <li><a href="http://stockhawk.herokuapp.com" target="_blank">StockHawk</a> - a realistic stock trading game written from scratch in Python using Flask, SQLAlchemy, WTForms, Flask-Cache, Flask-Mail, PostgreSQL and Yahoo-Finance's API.</li>
+      </ul>
+    </p>
+  </article>
+      </div>
+  </section>
+      <section class="module parallax parallax-3">
+        <div class="container">
+        </div>
+      </section>
+      <section class="module content">
+      <div class="container">
+</div>
+</section>
+</body>
+</html>
+

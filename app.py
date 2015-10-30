@@ -471,6 +471,10 @@ def db_view():
 	positions = Position.query.all()
 	return render_template("db_view.html", title=title, stocks=stocks, users=users, trades=trades, positions=positions, portfolios=portfolios, loggedin_user=user)
 
+@app.route('/aboutadam')
+def aboutadam():
+	return render_template('aboutadam.html')
+
 @app.route('/tos')
 def tos():
 	return render_template('tos.html')
