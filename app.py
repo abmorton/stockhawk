@@ -329,12 +329,13 @@ def not_found(e):
 	user = get_user()
 	return render_template('/404.html', loggedin_user=user)
 
-@app.route('/')
+@app.route('/about')
 @login_reminder
-def home():
+def about():
 	title = 'About StockHawk'
 	user = get_user()
 	return render_template('index.html', title=title, loggedin_user=user)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -371,7 +372,6 @@ def register():
 			return redirect(url_for('register'))
 	elif request.method == 'POST' and not form.validate():
 		flash('Try again.')
-		# return redirect(url_for('register'))
 	elif request.method == 'GET':
 		return render_template('register.html', title=title, form=form)
 	return render_template('register.html', title=title, form=form)
@@ -579,7 +579,7 @@ def delete_account():
 		flash('Type "DELETE" in the field below if you are sure you want to delete your account; this cannot be undone.')
 		return redirect(url_for('settings'))
 
-@app.route('/stocks', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 @login_reminder
 def stocks():
 	title = 'StockHawk'	
@@ -622,12 +622,11 @@ def stocks():
 			s.prettyprice = pretty_numbers(s.price)
 		return render_template('stocks.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user)
 
-@app.route('/stocks/<symbol>', methods=['GET', 'POST'])
-@login_reminder
+@app.route('/<symbol>', methods=['GET', 'POST'])
 def stock(symbol):
 	stock = get_Share(symbol)
 	if stock.data_set['Open'] == None:
-		flash("Couldn't find that stock. Try another symbol.")
+		# flash("Couldn't find that stock. Try another symbol.")
 		stock = None
 		return redirect(url_for('stocks'))
 	else:
@@ -674,16 +673,6 @@ def stock(symbol):
 
 	return render_template('stock.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user, position=position)
 
-# @app.route('/welcome')
-# def welcome():
-# 	title = 'Welcome'
-
-# 	if 'username' in session:
-# 		loggedin_user = session['username']
-# 	else:
-# 		loggedin_user = None
-
-# 	return render_template('welcome.html', title=title, loggedin_user=loggedin_user)
 
 if __name__ == '__main__':
 	app.run()
