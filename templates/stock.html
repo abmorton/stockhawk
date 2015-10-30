@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- <h1>{{ title }}</h1> -->
+  <head>
+    <link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.9.2.min.css" type="text/css" />
+    <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.9.2.min.js"></script>
+    {{ script | safe }}
+  </head>
 
 <div class="dashboard">
 {% if form %}
@@ -76,6 +80,11 @@
 			</table>
 		</div>
 </div>
+
+	<!-- graph stuff -->
+	<div class=page>
+	  {{ div | safe }}
+	</div>
 
 	{% endif %}
 <br>

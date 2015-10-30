@@ -10,6 +10,11 @@ import datetime
 import os
 import config
 
+# for plotting
+from bokeh.plotting import figure, output_file, show
+from bokeh.embed import components
+import pandas as pd
+
 # from helpers import get_datetime_today, pretty_numbers, pretty_ints, pretty_percent, pretty_leaders, get_leaderboard, get_user, get_account_details, clean_stock_search, get_Share, set_stock_data, write_stock_to_db, stock_lookup_and_write, search_company, convert_yhoo_date, trade
 
 # --------------------------------------------------------------------
@@ -317,6 +322,32 @@ def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 		else:
 			flash("You don't have any shares of " + stock.symbol + " to sell.")
 
+def prepare_graph(symbol, start, end):
+	
+	stock = Share(symbol)
+	stringprices = list(pd.DataFrame(stock.get_historical(start,end))['Adj_Close'])
+	stringdates = list(pd.DataFrame(stock.get_historical(start, end))['Date'])
+	
+	prices = [float(p) for p in stringprices]
+	dates = []    
+	
+	for d in stringdates:
+	    year, month, day = d.split('-')
+	    d = datetime.date(int(year), int(month), int(day))
+	    dates.append(d)
+
+	return prices, dates
+
+def build_plot(symbol, dates, prices):
+    x_data = dates
+    y_data = prices
+
+    p = figure(width=610, plot_height=300, tools='pan,box_zoom,reset', title=symbol.upper(), x_axis_label='Dates', x_axis_type='datetime', y_axis_label='Stock price')
+    p.line(x_data, y_data, line_width=2)
+    script, div = components(p)
+    return script, div
+
+
 # === decorator and email imports ======
 from decorators import *
 from emails import send_async_email, send_email, new_user_email, password_reminder_email, password_reset_email
@@ -334,8 +365,7 @@ def not_found(e):
 def about():
 	title = 'About StockHawk'
 	user = get_user()
-	return render_template('index.html', title=title, loggedin_user=user)
-
+	return render_template('about.html', title=title, loggedin_user=user)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -671,7 +701,13 @@ def stock(symbol):
 		flash("Invalid share amount; please try again.")
 		return redirect(url_for('stocks'))
 
-	return render_template('stock.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user, position=position)
+	if request.method == 'GET':
+		start = '2015-07-28'
+		end = '2015-10-30'
+		prices, dates = prepare_graph(symbol, start, end)
+		script, div = build_plot(symbol, dates, prices)
+
+	return render_template('stock.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user, position=position, script=script, div=div)
 
 
 if __name__ == '__main__':
