@@ -342,8 +342,10 @@ def build_plot(symbol, dates, prices):
     x_data = dates
     y_data = prices
 
-    p = figure(width=610, plot_height=300, tools='pan,box_zoom,reset', title=symbol.upper(), x_axis_label='3 month', x_axis_type='datetime', y_axis_label='$ per share')
+    p = figure(width=610, plot_height=300, tools='pan,box_zoom,reset', title=symbol.upper(), x_axis_label='3 month trend', x_axis_type='datetime', y_axis_label='$ per share')
     p.line(x_data, y_data, line_width=2)
+    p.ygrid.minor_grid_line_color = 'navy'
+    p.ygrid.minor_grid_line_alpha = 0.1
     script, div = components(p)
     return script, div
 
