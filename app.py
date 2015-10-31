@@ -14,6 +14,7 @@ import config
 from bokeh.plotting import figure, output_file, show
 from bokeh.embed import components
 import pandas as pd
+from numpy import pi
 
 # from helpers import get_datetime_today, pretty_numbers, pretty_ints, pretty_percent, pretty_leaders, get_leaderboard, get_user, get_account_details, clean_stock_search, get_Share, set_stock_data, write_stock_to_db, stock_lookup_and_write, search_company, convert_yhoo_date, trade
 
@@ -322,7 +323,7 @@ def trade(stock, share_amount, buy_or_sell, user, portfolio, positions):
 		else:
 			flash("You don't have any shares of " + stock.symbol + " to sell.")
 
-def prepare_graph(symbol, start, end):
+def prepare_stock_graph(symbol, start, end):
 	
 	stock = Share(symbol)
 	stringprices = list(pd.DataFrame(stock.get_historical(start,end))['Adj_Close'])
@@ -338,17 +339,56 @@ def prepare_graph(symbol, start, end):
 
 	return prices, dates
 
-def build_plot(symbol, dates, prices):
-    x_data = dates
-    y_data = prices
+def build_portfolio_pie(portfolio, positions):
+	percent_base = 0.00
+	percents = [percent_base]
+	for p in positions:
+		p.position_value_percentage = float(p.value)/float(portfolio.value-portfolio.cash)
+		percent_base = percent_base + float(p.position_value_percentage) 
+		percents.append(percent_base)
+	# percents.append(float(portfolio.cash)/float(portfolio.value))
+	stocknames = [p.symbol for p in positions]
+	# stocknames = stocknames.append('Cash')
 
-    p = figure(width=610, plot_height=300, tools='pan,box_zoom,reset', title=symbol.upper(), x_axis_label='3 month trend', x_axis_type='datetime', y_axis_label='$ per share')
-    p.line(x_data, y_data, line_width=2)
+	starts = [float(p)*2*pi for p in percents[:-1]]
+	ends = [float(p)*2*pi for p in percents[1:]]
+	# ends.append(starts[:-1])
+	color_palette = ['aqua', 'aquamarine', 'cadetblue', 'chartreuse', 'cornflowerblue','darkslateblue', 'darkslategray', 'deepskyblue','dodgerblue','lawngreen', 'lightblue', 'lightcyan', 'lightseagreen', 'lightsteelblue', 'mediumaquamarine','mediumblue','mediumseagreen', 'blue', 'green', 'navy','indigo','purple','cyan','darkblue','darkcyan','darkseagreen', 'darkturquoise', 'forestgreen','mediumturquoise']
+	colors = [color_palette[n] for n in range(0,len(percents))]
+
+	p = figure(x_range=(-1.1,1.85), y_range=(-1,1), title='Stock positions', toolbar_location='below', tools='', width=420, plot_height=320)
+
+	for n in range(0,len(positions)):
+		p.wedge(x=0, y=0, radius=1, start_angle=starts[n], end_angle=ends[n], color=colors[n], legend=stocknames[n])
+
+	p.xgrid.grid_line_color = None
+	p.ygrid.grid_line_color = None
+	p.xaxis.major_tick_line_color = None
+	p.xaxis.minor_tick_line_color = None
+	p.yaxis.major_tick_line_color = None
+	p.yaxis.minor_tick_line_color = None
+	p.outline_line_color = None
+
+	script, div = components(p)
+	return script, div, colors
+
+def build_stock_plot(symbol, dates, prices):
+    average_price = float(sum(prices))/len(prices)
+    average_dates = [0 for n in prices]
+    first_price = prices[-1]
+
+    p = figure(width=610, plot_height=300, tools='pan,box_zoom,reset', title='1 month period', x_axis_label=None, x_axis_type='datetime', y_axis_label='$ per share', toolbar_location='below')
+    p.line(dates, prices, color='navy', alpha=0.9, line_width=2, legend=symbol.upper())
+    p.line(dates, average_price, color='orange', legend='Average', alpha=0.4, line_width=1.5)
+    # p.line(dates, first_price, color='red', legend='Starting', alpha=0.4, line_width=1.5)
+
     p.ygrid.minor_grid_line_color = 'navy'
     p.ygrid.minor_grid_line_alpha = 0.1
+    p.legend.orientation = 'top_left'
+    p.legend.label_text_font = 'Helvetica'
+
     script, div = components(p)
     return script, div
-
 
 # === decorator and email imports ======
 from decorators import *
@@ -367,7 +407,7 @@ def not_found(e):
 def about():
 	title = 'About StockHawk'
 	user = get_user()
-	return render_template('about.html', title=title, loggedin_user=user)
+	return render_template('index.html', title=title, loggedin_user=user)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -529,8 +569,6 @@ def leaderboard():
 	return render_template('leaderboard.html', title=title, leaders=allplayers, loggedin_user=loggedin_user)
 
 @app.route('/user', methods=['GET', 'POST'])
-# @cache.cached(timeout=35)
-# unless I figure out a better way, I can't cache user pages. Two concurrent users are able to see the other's page if it's in cache! memoize might work, though...
 @login_required
 def user():
 	today = get_datetime_today()
@@ -546,7 +584,10 @@ def user():
 	if request.method == 'GET':
 		# refresh current stock prices and therefore account value
 		portfolio, positions = get_account_details(portfolio, positions)
-		return render_template('account.html', title=title, user=user, portfolio=portfolio, form=form, loggedin_user=loggedin_user, positions=positions)
+
+		script, div, colors = build_portfolio_pie(portfolio, positions)
+
+		return render_template('account.html', title=title, user=user, portfolio=portfolio, form=form, loggedin_user=loggedin_user, positions=positions, script=script, div=div, colors=colors)
 	elif request.method == 'POST' and form.validate():
 		stock = get_Share(form.symbol.data)
 		# stock = Share(clean_stock_search(form.symbol.data))
@@ -704,13 +745,12 @@ def stock(symbol):
 		return redirect(url_for('stocks'))
 
 	if request.method == 'GET':
-		start = '2015-07-28'
-		end = '2015-10-30'
-		prices, dates = prepare_graph(symbol, start, end)
-		script, div = build_plot(symbol, dates, prices)
+		start = '2015-09-30'
+		end = '2015-10-31'
+		prices, dates = prepare_stock_graph(symbol, start, end)
+		script, div = build_stock_plot(symbol, dates, prices)
 
 	return render_template('stock.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user, position=position, script=script, div=div)
-
 
 if __name__ == '__main__':
 	app.run()

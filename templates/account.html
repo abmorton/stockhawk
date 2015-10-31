@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 
+<!-- for bokeh graphs -->
+  <head>
+    <link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.9.2.min.css" type="text/css" />
+    <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.9.2.min.js"></script>
+    {{ script | safe }}
+  </head>
+
 <h1>{{ title }}</h1>
 <div class="dashboard">
 <h3>Positions dashboard</h3>
@@ -57,6 +64,7 @@
 	</tr>
 </table>
 </div>
+
 <div class="tradebox">
 	<h4>Make a trade</h4>
 	{% from "_formhelpers.html" import render_field %}
@@ -70,5 +78,14 @@
 	</form>
 </div>
 
-
-{% endblock %}
+<!-- graph stuff -->
+<div class=page>
+  {{ div | safe }}
+</div>
+<!-- <span id="position_pie_legend"><ul>
+	{% for position in positions %}
+		<li>{{ position.symbol }}</li>
+	{% endfor %}
+</ul>
+</span>
+ -->{% endblock %}
