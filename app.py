@@ -99,8 +99,11 @@ def get_account_details(portfolio, positions):
 	value = portfolio.cash
 	total_gain_loss = float(0.00)
 	total_cost = float(0.00)
+	portfolio.daily_gain = 0.000
 	for p in positions:
-		stock_lookup_and_write(p.symbol)
+		# stock_lookup_and_write(p.symbol) # unfactoring to use stock.stuff
+		stock = set_stock_data(Share(p.symbol))
+		write_stock_to_db(stock)
 		p.value = Stock.query.filter_by(symbol=p.symbol).first().price*p.sharecount
 		p.prettyvalue = pretty_numbers(p.value)
 		p.prettycost = pretty_numbers(p.cost)
@@ -113,6 +116,14 @@ def get_account_details(portfolio, positions):
 		total_gain_loss = float(p.gain_loss) + total_gain_loss
 		total_cost = float(p.cost) + total_cost
 		p.prettygain_loss_percent = pretty_percent(p.gain_loss_percent)
+		p.daily_gain = float(stock.change)*p.sharecount
+		p.prettydaily_gain = pretty_numbers(p.daily_gain) 
+		if p.daily_gain <= 0.0000:
+			p.daily_gain_loss = True
+		portfolio.daily_gain += p.daily_gain
+	portfolio.prettydaily_gain = pretty_numbers(portfolio.daily_gain)
+	if portfolio.daily_gain <= 0.0000:
+		portfolio.daily_gain_loss = True
 	portfolio.total_cost = total_cost
 	portfolio.prettytotal_cost = pretty_numbers(total_cost)
 	portfolio.value = value
@@ -122,6 +133,7 @@ def get_account_details(portfolio, positions):
 	portfolio.prettytotal_stock_value = pretty_numbers(portfolio.total_stock_value)
 	portfolio.total_gain_loss = total_gain_loss
 	portfolio.prettytotal_gain_loss = pretty_numbers(portfolio.total_gain_loss)
+	
 	if portfolio.total_cost != 0.00:
 		portfolio.total_gain_loss_percent = portfolio.total_gain_loss/portfolio.total_cost*100
 		portfolio.prettytotal_gain_loss_percent = pretty_percent(portfolio.total_gain_loss_percent)
@@ -584,6 +596,7 @@ def user():
 	if request.method == 'GET':
 		# refresh current stock prices and therefore account value
 		portfolio, positions = get_account_details(portfolio, positions)
+
 
 		script, div, colors = build_portfolio_pie(portfolio, positions)
 

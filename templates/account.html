@@ -31,13 +31,23 @@
 	{% if position.loss %}
 		<td class="loss">{{ position.prettygain_loss }}</td>
 		<td class="loss">{{ position.prettygain_loss_percent }}</td>
+		{% if position.daily_gain_loss %}
+		<td class="loss">{{ position.prettydaily_gain }}</td>
+		{% endif %}
+		{% if not position.daily_gain_loss %}
+		<td class="gain">{{ position.prettydaily_gain }}</td>
+		{% endif %}
 	{% endif %}
 	{% if not position.loss %}
 		<td class="gain">{{ position.prettygain_loss }}</td>
 		<td class="gain">{{ position.prettygain_loss_percent }}</td>
+		{% if position.daily_gain_loss %}
+		<td class="loss">{{ position.prettydaily_gain }}</td>
+		{% endif %}
+		{% if not position.daily_gain_loss %}
+		<td class="gain">{{ position.prettydaily_gain }}</td>
+		{% endif %}
 	{% endif %}
-
-		<td></td>
 	</tr>
 	{% endfor %}
 	<tr class="tableheader">
@@ -53,7 +63,12 @@
 			<td class="gain">{{ portfolio.prettytotal_gain_loss }}</td>
 			<td class="gain">{{ portfolio.prettytotal_gain_loss_percent }}</td>
 		{% endif %}
-		<td></td>
+		{% if portfolio.daily_gain_loss %}
+		<td class="loss">{{ portfolio.prettydaily_gain }}</td>
+		{% endif %}
+		{% if not portfolio.daily_gain_loss %}
+		<td class="gain">{{ portfolio.prettydaily_gain }}</td>
+		{% endif %}	
 	</tr>
 	<tr>
 		<td>Cash available: </td>
