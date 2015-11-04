@@ -766,4 +766,5 @@ def stock(symbol):
 	return render_template('stock.html', form=form, tradeform=tradeform, stock=stock, stocks=stocks, leaders=leaders, title=title, user=user, loggedin_user=loggedin_user, position=position, script=script, div=div)
 
 if __name__ == '__main__':
+	# app.run(host='0.0.0.0')
 	app.run()
